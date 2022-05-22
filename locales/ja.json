@@ -1,0 +1,15 @@
+{
+  "appName": "インスタント家計簿",
+  "common": {
+    "plus": "＋",
+    "minus": "－",
+    "yen": "円",
+    "mail": "メールアドレス",
+    "password": "パスワード",
+    "login": "ログイン",
+    "holdLogin": "ログイン状態を保持",
+    "month": "月",
+    "spending": "支出",
+    "income": "収入"
+  }
+}
