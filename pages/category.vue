@@ -4,35 +4,46 @@
       <v-row class="pr-4 mt-1"> <v-spacer /><BurgerMenu /> </v-row>
     </v-container>
     <v-tabs v-model="tab">
-      <v-tab v-for="(category, i) in categories" :key="i">{{
-        category.paymentName
-      }}</v-tab>
+      <v-tab v-for="(category, i) in categories" :key="i">
+        {{ category.paymentName }}
+      </v-tab>
     </v-tabs>
-    <v-container>
-      <v-tabs-items v-model="tab">
-        <v-tab-item v-for="(category, k) in categories" :key="k">
-          <v-simple-table v-for="(parent, i) in parents" :key="i">
-            <thead v-if="parent.paymentFlag == category.paymentFlag">
-              <tr>
-                <th>
-                  {{ parent.name }}
-                </th>
-              </tr>
-            </thead>
-            <tbody v-for="(child, j) in childs" :key="j">
-              <tr
+    <v-tabs-items v-model="tab">
+      <v-tab-item v-for="(category, k) in categories" :key="k">
+        <v-card v-for="(parent, i) in parents" :key="i" tile flat class="mx-3">
+          <v-list v-if="parent.paymentFlag == category.paymentFlag" dense>
+            <v-subheader>{{ parent.name }}</v-subheader>
+            <div v-for="(child, j) in childs" :key="j">
+              <v-list-item
                 v-if="
                   child.parentId == parent.id &&
                   parent.paymentFlag == category.paymentFlag
                 "
               >
-                <td>{{ child.name }}</td>
-              </tr>
-            </tbody>
-          </v-simple-table>
-        </v-tab-item>
-      </v-tabs-items>
-    </v-container>
+                <v-text-field
+                  :value="child.name"
+                  :disabled="disabled"
+                ></v-text-field>
+              </v-list-item>
+            </div>
+          </v-list>
+          <v-container
+            v-if="parent.paymentFlag == category.paymentFlag"
+            class="d-flex justify-end pa-1"
+          >
+            <v-btn
+              fab
+              small
+              color="green"
+              elevation="1"
+              @click="editCategory(parent.id)"
+            >
+              <v-icon color="white" size="20">mdi-pencil</v-icon>
+            </v-btn>
+          </v-container>
+        </v-card>
+      </v-tab-item>
+    </v-tabs-items>
   </div>
 </template>
 
@@ -40,7 +51,8 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 @Component
 export default class Category extends Vue {
-  tab = null
+  tab: any = null
+  disabled: boolean = true
   categories = [
     {
       paymentName: '支出',
@@ -80,6 +92,10 @@ export default class Category extends Vue {
       name: 'ディナー',
     },
     {
+      parentId: 3,
+      name: '副業',
+    },
+    {
       parentId: 2,
       name: '書籍',
     },
@@ -87,21 +103,11 @@ export default class Category extends Vue {
       parentId: 3,
       name: '給料',
     },
-    // {
-    //   categoryParent: '食費',
-    //   categoryChild: 'ディナー',
-    //   paymentFlag: 1,
-    // },
-    // {
-    //   categoryParent: '趣味',
-    //   categoryChild: '書籍',
-    //   paymentFlag: 1,
-    // },
-    // {
-    //   categoryParent: '仕事',
-    //   categoryChild: '給料',
-    //   paymentFlag: 0,
-    // },
   ]
+
+  editCategory(parentId: number) {
+    console.log('hello:' + parentId)
+    this.disabled = !this.disabled
+  }
 }
 </script>
