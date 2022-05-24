@@ -9,39 +9,25 @@
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab">
-      <v-tab-item v-for="(category, k) in categories" :key="k">
-        <v-card v-for="(parent, i) in parents" :key="i" tile flat class="mx-3">
-          <v-list v-if="parent.paymentFlag == category.paymentFlag" dense>
-            <v-subheader>{{ parent.name }}</v-subheader>
-            <div v-for="(child, j) in childs" :key="j">
-              <v-list-item
-                v-if="
-                  child.parentId == parent.id &&
-                  parent.paymentFlag == category.paymentFlag
-                "
-              >
-                <v-text-field
-                  :value="child.name"
-                  :disabled="disabled"
-                ></v-text-field>
-              </v-list-item>
-            </div>
-          </v-list>
-          <v-container
-            v-if="parent.paymentFlag == category.paymentFlag"
-            class="d-flex justify-end pa-1"
-          >
-            <v-btn
-              fab
-              small
-              color="green"
-              elevation="1"
-              @click="editCategory(parent.id)"
-            >
-              <v-icon color="white" size="20">mdi-pencil</v-icon>
-            </v-btn>
-          </v-container>
-        </v-card>
+      <!-- 支出タブの中身 -->
+      <v-tab-item>
+        <div v-for="(data, i) in datas" :key="i">
+          <CategoryTable
+            v-if="data.paymentFlag == tab"
+            :parent="data.parent"
+            :childs="data.childs"
+          />
+        </div>
+      </v-tab-item>
+      <!-- 収入タブの中身 -->
+      <v-tab-item>
+        <div v-for="(data, i) in datas" :key="i">
+          <CategoryTable
+            v-if="data.paymentFlag == tab"
+            :parent="data.parent"
+            :childs="data.childs"
+          />
+        </div>
       </v-tab-item>
     </v-tabs-items>
   </div>
@@ -56,58 +42,33 @@ export default class Category extends Vue {
   categories = [
     {
       paymentName: '支出',
-      paymentFlag: 1,
+      paymentFlag: 0,
     },
     {
       paymentName: '収入',
-      paymentFlag: 0,
+      paymentFlag: 1,
     },
   ]
 
-  parents = [
-    {
-      id: 1,
-      name: '食費',
-      paymentFlag: 1,
-    },
-    {
-      id: 2,
-      name: '趣味',
-      paymentFlag: 1,
-    },
-    {
-      id: 3,
-      name: '仕事',
-      paymentFlag: 0,
-    },
-  ]
-
-  childs = [
-    {
-      parentId: 1,
-      name: 'ランチ',
-    },
-    {
-      parentId: 1,
-      name: 'ディナー',
-    },
+  datas = [
     {
       parentId: 3,
-      name: '副業',
+      parent: '仕事',
+      childs: ['副業', '給料'],
+      paymentFlag: 1,
+    },
+    {
+      parentId: 1,
+      parent: '食費',
+      childs: ['ランチ', 'ディナー'],
+      paymentFlag: 0,
     },
     {
       parentId: 2,
-      name: '書籍',
-    },
-    {
-      parentId: 3,
-      name: '給料',
+      parent: '趣味',
+      childs: ['書籍'],
+      paymentFlag: 0,
     },
   ]
-
-  editCategory(parentId: number) {
-    console.log('hello:' + parentId)
-    this.disabled = !this.disabled
-  }
 }
 </script>
