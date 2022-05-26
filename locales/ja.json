@@ -8,7 +8,9 @@
     "password": "パスワード",
     "login": "ログイン",
     "holdLogin": "ログイン状態を保持",
+    "year": "年",
     "month": "月",
+    "day": "日",
     "spending": "支出",
     "income": "収入"
   }

@@ -14,7 +14,8 @@
       </v-list>
       <v-container class="d-flex justify-end pa-1">
         <v-btn fab small color="green" elevation="1" @click="edit()">
-          <v-icon color="white" size="20">mdi-pencil</v-icon>
+          <v-icon v-if="readOnly" color="white" size="20">mdi-pencil</v-icon>
+          <v-icon v-else color="white" size="20">mdi-lock</v-icon>
         </v-btn>
       </v-container>
     </v-card>
@@ -37,7 +38,6 @@ export default class CategoryTable extends Vue {
 
   edit() {
     this.readOnly = !this.readOnly
-    // this.$emit('editCategory', this.parent, this.childs)
   }
 }
 </script>

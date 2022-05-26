@@ -15,26 +15,37 @@
     </v-row>
     <v-card-title>{{ amountPay }}{{ $t('common.yen') }}</v-card-title>
     <v-sheet height="600">
-      <v-calendar ref="calendar" v-model="value" locale="ja" event-height="80">
-        <template #day-label="{ day, weekday }">
-          <p v-if="weekend.includes(weekday)" class="text-pay">
+      <v-calendar
+        ref="calendar"
+        v-model="value"
+        locale="ja"
+        :event-height="eventHeight"
+      >
+        <template #day-label="{ day, weekday, date }">
+          <p
+            v-if="weekend.includes(weekday)"
+            class="text-pay"
+            @click="show(date)"
+          >
             {{ day }}
           </p>
-          <p v-else>{{ day }}</p>
+          <p v-else @click="show(date)">{{ day }}</p>
         </template>
         <template #day="{ date }">
-          <v-container>
-            <div v-for="(payment, i) in payments" :key="i">
-              <v-row v-if="payment.date == date">
-                <p v-if="payment.paymentFrag" class="text-income pl-2">
-                  {{ $t('common.plus') }}{{ payment.amount }}
-                </p>
-                <p v-else class="text-pay pl-2">
-                  {{ $t('common.minus') }}{{ payment.amount }}
-                </p>
-              </v-row>
-            </div>
-          </v-container>
+          <v-card height="70" flat tile @click="show(date)">
+            <v-container>
+              <div v-for="(payment, i) in payments" :key="i">
+                <v-row v-if="payment.date == date">
+                  <p v-if="payment.paymentFrag" class="text-income">
+                    {{ $t('common.plus') }}{{ payment.amount }}
+                  </p>
+                  <p v-else class="text-pay">
+                    {{ $t('common.minus') }}{{ payment.amount }}
+                  </p>
+                </v-row>
+              </div>
+            </v-container>
+          </v-card>
         </template>
       </v-calendar>
     </v-sheet>
@@ -53,12 +64,19 @@ export default class Calendar extends Vue {
   @Prop({ type: Number, required: true })
   amountPay!: number
 
+  eventHeight: number = 1000
+
   weekend: number[] = [0, 6]
 
   value = moment().format('yyyy-MM-DD')
 
   get title() {
     return moment(this.value).format('yyyy / M')
+  }
+
+  show(date: string) {
+    // paymentDetail?target=[yyyy-MM-dd] で遷移
+    this.$router.push({ path: 'paymentDetail', query: { target: date } })
   }
 }
 </script>
