@@ -17,11 +17,10 @@
       ></v-text-field>
     </template>
     <v-date-picker
-      v-model="date"
+      v-model="inputValue"
       no-title
       locale="jp-ja"
       :day-format="(date) => new Date(date).getDate()"
-      @input="menu = false"
     ></v-date-picker>
   </v-menu>
 </template>
@@ -47,6 +46,15 @@ export default class paymentDetail extends Vue {
       day +
       this.$t('common.day')
     )
+  }
+
+  get inputValue(): string {
+    return this.date
+  }
+
+  set inputValue(val: string) {
+    this.$emit('changeDate', val)
+    this.menu = false
   }
 }
 </script>

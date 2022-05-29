@@ -19,7 +19,7 @@
         ref="calendar"
         v-model="value"
         locale="ja"
-        :event-height="eventHeight"
+        :event-height="1000"
       >
         <template #day-label="{ day, weekday, date }">
           <p
@@ -63,8 +63,6 @@ export default class Calendar extends Vue {
 
   @Prop({ type: Number, required: true })
   amountPay!: number
-
-  eventHeight: number = 1000
 
   weekend: number[] = [0, 6]
 

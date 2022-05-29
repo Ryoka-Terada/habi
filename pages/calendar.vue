@@ -31,41 +31,16 @@ import { Vue, Component } from 'nuxt-property-decorator'
 export default class Index extends Vue {
   amountPay!: number
   payments: { amount: number; paymentFrag: number; date: string }[] = [
-    {
-      amount: 1000,
-      paymentFrag: 0,
-      date: '2022-06-10',
-    },
-    {
-      amount: 850,
-      paymentFrag: 0,
-      date: '2022-05-12',
-    },
-    {
-      amount: 2050,
-      paymentFrag: 1,
-      date: '2022-05-20',
-    },
-    {
-      amount: 340,
-      paymentFrag: 0,
-      date: '2022-05-20',
-    },
+    { amount: 1000, paymentFrag: 0, date: '2022-06-10' },
+    { amount: 850, paymentFrag: 0, date: '2022-05-12' },
+    { amount: 2050, paymentFrag: 1, date: '2022-05-20' },
+    { amount: 340, paymentFrag: 0, date: '2022-05-20' },
   ]
 
   categoryAmounts: { category: string; amount: number }[] = [
-    {
-      category: '食費',
-      amount: 99999,
-    },
-    {
-      category: '趣味',
-      amount: 99999,
-    },
-    {
-      category: 'その他',
-      amount: 99999,
-    },
+    { category: '食費', amount: 99999 },
+    { category: '趣味', amount: 99999 },
+    { category: 'その他', amount: 99999 },
   ]
 
   created() {

@@ -15,7 +15,7 @@
     </v-row>
     <v-row justify="center" dense>
       <v-col cols="9">
-        <Checkbox :label="$t('common.holdLogin')" />
+        <v-checkbox :label="$t('common.holdLogin')"></v-checkbox>
       </v-col>
     </v-row>
     <v-row justify="center">
