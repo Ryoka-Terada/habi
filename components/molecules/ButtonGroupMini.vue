@@ -9,6 +9,7 @@
         borderless
         tile
         :color="color"
+        @change="childId"
       >
         <div v-for="(button, i) in data" :key="i">
           <v-btn
@@ -30,10 +31,10 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 @Component
 export default class ButtonGroupMini extends Vue {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   parentId!: string
 
-  @Prop({ type: Array, required: true })
+  @Prop({ type: Array, required: false })
   data!: { label: string; value: string; parentId: string }[]
 
   @Prop({ type: Boolean, required: true })
@@ -43,6 +44,10 @@ export default class ButtonGroupMini extends Vue {
 
   get color(): string {
     return this.paymentFlag ? 'green' : 'red'
+  }
+
+  childId() {
+    this.$emit('childId', this.selectVal)
   }
 }
 </script>
