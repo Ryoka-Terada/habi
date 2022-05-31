@@ -27,8 +27,10 @@ export default class Toggle extends Vue {
   @Prop({ type: String, required: true })
   uncheck!: string
 
+  // トグルボタンの機能がデフォルト未選択（value=false）となっている
+  // 要件的にデフォルト支出（value=true）としたいため、ここではあえてトグルと反対の値で親を更新する
   onChange(eventVal: boolean) {
-    this.$emit('onChange', eventVal)
+    this.$emit('onChange', !eventVal)
   }
 }
 </script>

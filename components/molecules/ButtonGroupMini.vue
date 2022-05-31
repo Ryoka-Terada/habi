@@ -11,14 +11,14 @@
         :color="color"
         @change="childId"
       >
-        <div v-for="(button, i) in data" :key="i">
+        <div v-for="(category, i) in data" :key="i">
           <v-btn
-            v-if="parentId === button.parentId"
+            v-if="parentId === category.parentId"
             small
             class="ma-2"
-            :value="button.value"
+            :value="category.value"
           >
-            {{ button.label }}
+            {{ category.label }}
           </v-btn>
         </div>
       </v-btn-toggle>
@@ -43,7 +43,7 @@ export default class ButtonGroupMini extends Vue {
   selectVal: string = ''
 
   get color(): string {
-    return this.paymentFlag ? 'green' : 'red'
+    return this.paymentFlag ? 'red' : 'green'
   }
 
   childId() {

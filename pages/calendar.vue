@@ -18,7 +18,7 @@
     </v-container>
     <v-footer class="pb-4" app color="rgba(107,78,113,.0)">
       <v-spacer />
-      <v-btn fab elevation="5" to="/">
+      <v-btn fab elevation="5" to="/paymentDetail?target">
         <v-icon> mdi-plus </v-icon>
       </v-btn>
     </v-footer>

@@ -3,6 +3,7 @@
   "common": {
     "plus": "＋",
     "minus": "－",
+    "colon": "：",
     "yen": "円",
     "mail": "メールアドレス",
     "password": "パスワード",

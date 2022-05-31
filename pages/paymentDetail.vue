@@ -26,17 +26,38 @@
             <v-col cols="3" class="d-flex justify-center">
               <Toggle
                 :value="paymentFlag"
-                :check="$t('common.income')"
                 :uncheck="$t('common.spending')"
+                :check="$t('common.income')"
                 @onChange="onChange"
               />
             </v-col>
           </v-row>
           <v-row>
             <v-col>
-              <PaymentList />
+              <div v-for="(paymentData, i) in paymentDataList" :key="i">
+                <PaymentList
+                  :label="
+                    getParentName(paymentData.parentId) +
+                    $t('common.colon') +
+                    getChildName(paymentData.childId)
+                  "
+                  :amount="paymentData.amount"
+                  :payment-flag="paymentData.paymentFlag"
+                  :list-no="i"
+                  @close="close"
+                />
+              </div>
             </v-col>
           </v-row>
+          <!-- <v-row>
+            <v-col>
+              <PaymentList
+                label="趣味：書籍old"
+                amount="2000"
+                :payment-flag="true"
+              />
+            </v-col>
+          </v-row> -->
           <v-row align="center">
             <v-col cols="9" class="mx-3">
               <v-text-field v-model="amount"></v-text-field>
@@ -87,49 +108,73 @@
 
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
+import moment from 'moment'
 
 @Component
 export default class paymentDetail extends Vue {
-  date: string | (string | null)[] = this.$route.query.target
-  paymentFlag: boolean = false
+  /** カレンダーに表示する日付 */
+  date: string = ''
+  paymentFlag: boolean = true
   amount: number = 0
   parentId: string = '0'
   childId: string = '0'
 
+  /** 選択された日付のデータ */
+  paymentDataList: {
+    parentId: string
+    childId: string
+    amount: number
+    paymentFlag: boolean
+  }[] = [{ parentId: '', childId: '', amount: 0, paymentFlag: true }]
+
   /** 親データ */
-  parentData: { label: string; value: string }[] = [
-    { label: '食費', value: '1' },
-    { label: '趣味', value: '2' },
-    { label: 'その他', value: '3' },
-    { label: 'その他2', value: '4' },
-    { label: 'その他3', value: '5' },
+  parentData: { label: string; parentId: string; paymentFlag: boolean }[] = [
+    { label: '食費', parentId: '1', paymentFlag: true },
+    { label: '趣味', parentId: '2', paymentFlag: true },
+    { label: 'その他', parentId: '3', paymentFlag: true },
+    { label: 'その他2', parentId: '4', paymentFlag: true },
+    { label: 'その他3', parentId: '5', paymentFlag: false }, // 収入
   ]
 
-  /** 表示する子データ */
-  childData: { label: string; value: string; parentId: string }[] = [
-    { label: '', value: '', parentId: '' },
+  /** 画面に表示する子データ */
+  childData: { label: string; childId: string; parentId: string }[] = [
+    { label: '', childId: '', parentId: '' },
   ]
 
   /** 子の元データ */
-  childBaseData: { label: string; value: string; parentId: string }[] = [
-    { label: 'ランチ', value: '1', parentId: '1' },
-    { label: 'ディナー', value: '2', parentId: '1' },
-    { label: 'おやつ', value: '3', parentId: '1' },
-    { label: 'ドリンク', value: '4', parentId: '1' },
-    { label: 'その他', value: '5', parentId: '1' },
-    { label: '書籍', value: '6', parentId: '2' },
+  childBaseData: { label: string; childId: string; parentId: string }[] = [
+    { label: 'ランチ', childId: '1', parentId: '1' },
+    { label: 'ディナー', childId: '2', parentId: '1' },
+    { label: 'おやつ', childId: '3', parentId: '1' },
+    { label: 'ドリンク', childId: '4', parentId: '1' },
+    { label: 'その他', childId: '5', parentId: '1' },
+    { label: '書籍', childId: '6', parentId: '2' },
   ]
 
   /** 親を選択された時、表示する子データを抽出 */
   selectParentId(val: string) {
     this.parentId = val
-    const datas = [{ label: '', value: '', parentId: '' }]
-    this.childBaseData.forEach((data) => {
-      if (this.parentId === data.parentId) {
-        datas.push(data)
-      }
+    // childBaseDataのparentIdがthis.parentIdと一致する配列のみchildDataに入れる
+    this.childData = this.childBaseData.filter((data) => {
+      return data.parentId === this.parentId
     })
-    this.childData = datas
+  }
+
+  /** 親カテゴリIDから名前を取得 */
+  getParentName(id: string): string {
+    return this.parentData.filter((data) => {
+      return data.parentId === id
+    })[0].label
+  }
+
+  /** 子カテゴリIDから名前を取得 */
+  getChildName(id: string): string {
+    if (id === '') {
+      return ''
+    }
+    return this.childBaseData.filter((data) => {
+      return data.childId === id
+    })[0].label
   }
 
   /** 子データを選択されたとき */
@@ -137,11 +182,25 @@ export default class paymentDetail extends Vue {
     this.childId = val
   }
 
+  /** 収支カードの×を押されたとき */
+  close(listNo: number) {
+    console.log(listNo + '番目を配列からデータを消す')
+  }
+
   created() {
-    if (this.date === '') {
-      // 日付が渡されなかったら今日の日付選択状態で新規登録画面に飛ばす
+    if (this.$route.query.target === null) {
+      // 日付が渡されなかったら今日の日付を選択する
+      this.date = moment().format('yyyy-MM-DD')
     } else {
+      // パラメータの日付をセット
+      this.date = this.$route.query.target.toString()
       // 日付で検索を掛けて収支詳細を取得
+      this.paymentDataList = [
+        { parentId: '2', childId: '6', amount: 2200, paymentFlag: true },
+        { parentId: '1', childId: '3', amount: 500, paymentFlag: true },
+        { parentId: '3', childId: '', amount: 800, paymentFlag: true },
+        { parentId: '5', childId: '', amount: 800, paymentFlag: false },
+      ]
     }
   }
 
@@ -154,6 +213,7 @@ export default class paymentDetail extends Vue {
 
   updateData(status: string) {
     console.log(status)
+    this.$router.push('/calendar')
   }
 
   changeDate(date: string) {

@@ -10,12 +10,12 @@
         @change="parentId"
       >
         <v-btn
-          v-for="(button, i) in data"
+          v-for="(category, i) in categoryData"
           :key="i"
           class="ma-2"
-          :value="button.value"
+          :value="category.parentId"
         >
-          {{ button.label }}
+          {{ category.label }}
         </v-btn>
       </v-btn-toggle>
     </div>
@@ -28,7 +28,7 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 @Component
 export default class ButtonGroup extends Vue {
   @Prop({ type: Array, required: true })
-  data!: { label: string; value: string }[]
+  data!: { label: string; parentId: string; paymentFlag: boolean }[]
 
   @Prop({ type: Boolean, required: true })
   paymentFlag!: boolean
@@ -36,7 +36,13 @@ export default class ButtonGroup extends Vue {
   selectVal: string = ''
 
   get color(): string {
-    return this.paymentFlag ? 'green' : 'red'
+    return this.paymentFlag ? 'red' : 'green'
+  }
+
+  get categoryData(): any {
+    return this.data.filter((data) => {
+      return data.paymentFlag === this.paymentFlag
+    })
   }
 
   parentId() {
