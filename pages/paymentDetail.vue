@@ -36,9 +36,9 @@
             <v-col>
               <div v-for="(paymentData, i) in paymentDataList" :key="i">
                 <PaymentList
+                  v-if="paymentData.paymentFlag !== null"
                   :label="
                     getParentName(paymentData.parentId) +
-                    $t('common.colon') +
                     getChildName(paymentData.childId)
                   "
                   :amount="paymentData.amount"
@@ -162,6 +162,9 @@ export default class paymentDetail extends Vue {
 
   /** 親カテゴリIDから名前を取得 */
   getParentName(id: string): string {
+    if (id === '') {
+      return ''
+    }
     return this.parentData.filter((data) => {
       return data.parentId === id
     })[0].label
@@ -172,9 +175,12 @@ export default class paymentDetail extends Vue {
     if (id === '') {
       return ''
     }
-    return this.childBaseData.filter((data) => {
-      return data.childId === id
-    })[0].label
+    return (
+      this.$t('common.colon') +
+      this.childBaseData.filter((data) => {
+        return data.childId === id
+      })[0].label
+    )
   }
 
   /** 子データを選択されたとき */
@@ -184,7 +190,12 @@ export default class paymentDetail extends Vue {
 
   /** 収支カードの×を押されたとき */
   close(listNo: number) {
-    console.log(listNo + '番目を配列からデータを消す')
+    this.paymentDataList.splice(listNo, 1, {
+      parentId: '',
+      childId: '',
+      amount: 0,
+      paymentFlag: null,
+    })
   }
 
   created() {
@@ -199,6 +210,7 @@ export default class paymentDetail extends Vue {
         { parentId: '2', childId: '6', amount: 2200, paymentFlag: true },
         { parentId: '1', childId: '3', amount: 500, paymentFlag: true },
         { parentId: '3', childId: '', amount: 800, paymentFlag: true },
+        { parentId: '', childId: '', amount: 100, paymentFlag: true },
         { parentId: '5', childId: '', amount: 800, paymentFlag: false },
       ]
     }
