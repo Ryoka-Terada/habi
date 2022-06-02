@@ -15,7 +15,7 @@
           class="ma-2"
           :value="category.parentId"
         >
-          {{ category.label }}
+          {{ category.label }}:{{ selectVal }}
         </v-btn>
       </v-btn-toggle>
     </div>

@@ -116,8 +116,8 @@ export default class paymentDetail extends Vue {
   date: string = ''
   paymentFlag: boolean = true
   amount: number = 0
-  parentId: string = '0'
-  childId: string = '0'
+  parentId: string = ''
+  childId: string = ''
 
   /** 選択された日付のデータ */
   paymentDataList: {
@@ -218,9 +218,16 @@ export default class paymentDetail extends Vue {
 
   addPaymentList() {
     console.log('金額は' + this.amount)
-    console.log('false=支出、true=収入→' + this.paymentFlag)
+    console.log('true=支出、false=収入→' + this.paymentFlag)
     console.log('カテゴリ大は' + this.parentId)
     console.log('カテゴリ小は' + this.childId)
+    const inputData = {
+      parentId: this.parentId,
+      childId: this.childId,
+      amount: this.amount,
+      paymentFlag: this.paymentFlag,
+    }
+    this.paymentDataList.push(inputData)
   }
 
   updateData(status: string) {
@@ -234,6 +241,7 @@ export default class paymentDetail extends Vue {
 
   onChange(eventVal: boolean) {
     this.paymentFlag = eventVal
+    this.parentId = ''
   }
 }
 </script>

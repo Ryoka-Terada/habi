@@ -16,9 +16,9 @@
             v-if="parentId === category.parentId"
             small
             class="ma-2"
-            :value="category.value"
+            :value="category.childId"
           >
-            {{ category.label }}
+            {{ category.label }}:{{ selectVal }}
           </v-btn>
         </div>
       </v-btn-toggle>
@@ -35,7 +35,7 @@ export default class ButtonGroupMini extends Vue {
   parentId!: string
 
   @Prop({ type: Array, required: false })
-  data!: { label: string; value: string; parentId: string }[]
+  data!: { label: string; childId: string; parentId: string }[]
 
   @Prop({ type: Boolean, required: true })
   paymentFlag!: boolean
