@@ -25,8 +25,8 @@
             </v-col>
             <v-col cols="3" class="d-flex justify-center">
               <Toggle
-                :value="paymentFlag"
-                :uncheck="$t('common.spending')"
+                :value="isPay"
+                :uncheck="$t('common.pay')"
                 :check="$t('common.income')"
                 @onChange="onChange"
               />
@@ -36,28 +36,30 @@
             <v-col>
               <div v-for="(paymentData, i) in paymentDataList" :key="i">
                 <PaymentList
-                  v-if="paymentData.paymentFlag !== null"
+                  :label="
+                    getParentName(paymentData.parentId) +
+                    '：' +
+                    paymentData.childId
+                  "
+                  :amount="paymentData.amount"
+                  :is-pay="paymentData.isPay"
+                  :list-no="i"
+                  @close="close"
+                />
+                <!-- <PaymentList
+                  v-if="paymentData.isPay !== null"
                   :label="
                     getParentName(paymentData.parentId) +
                     getChildName(paymentData.childId)
                   "
                   :amount="paymentData.amount"
-                  :payment-flag="paymentData.paymentFlag"
+                  :payment-flag="paymentData.isPay"
                   :list-no="i"
                   @close="close"
-                />
+                /> -->
               </div>
             </v-col>
           </v-row>
-          <!-- <v-row>
-            <v-col>
-              <PaymentList
-                label="趣味：書籍old"
-                amount="2000"
-                :payment-flag="true"
-              />
-            </v-col>
-          </v-row> -->
           <v-row align="center">
             <v-col cols="9" class="mx-3">
               <v-text-field v-model="amount"></v-text-field>
@@ -66,16 +68,16 @@
           </v-row>
           <v-row class="mx-3">
             <ButtonGroupMini
-              :parent-id="parentId"
+              v-if="parentId"
               :data="childData"
-              :payment-flag="paymentFlag"
+              :is-pay="isPay"
               @childId="selectChildId"
             />
           </v-row>
           <v-row class="mx-3">
             <ButtonGroup
               :data="parentData"
-              :payment-flag="paymentFlag"
+              :is-pay="isPay"
               @parentId="selectParentId"
             />
           </v-row>
@@ -109,12 +111,13 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 import moment from 'moment'
+import { categoryStore } from '../store'
 
 @Component
 export default class paymentDetail extends Vue {
   /** カレンダーに表示する日付 */
   date: string = ''
-  paymentFlag: boolean = true
+  isPay: boolean = true
   amount: number = 0
   parentId: string = ''
   childId: string = ''
@@ -124,63 +127,48 @@ export default class paymentDetail extends Vue {
     parentId: string
     childId: string
     amount: number
-    paymentFlag: boolean
-  }[] = [{ parentId: '', childId: '', amount: 0, paymentFlag: true }]
+    isPay: boolean
+  }[] = []
 
-  /** 親データ */
-  parentData: { label: string; parentId: string; paymentFlag: boolean }[] = [
-    { label: '食費', parentId: '1', paymentFlag: true },
-    { label: '趣味', parentId: '2', paymentFlag: true },
-    { label: 'その他', parentId: '3', paymentFlag: true },
-    { label: 'その他2', parentId: '4', paymentFlag: true },
-    { label: 'その他3', parentId: '5', paymentFlag: false }, // 収入
-  ]
+  /** 親カテゴリデータ */
+  parentData: { id: string; name: string; isPay: boolean }[] = []
 
-  /** 画面に表示する子データ */
-  childData: { label: string; childId: string; parentId: string }[] = [
-    { label: '', childId: '', parentId: '' },
-  ]
-
-  /** 子の元データ */
-  childBaseData: { label: string; childId: string; parentId: string }[] = [
-    { label: 'ランチ', childId: '1', parentId: '1' },
-    { label: 'ディナー', childId: '2', parentId: '1' },
-    { label: 'おやつ', childId: '3', parentId: '1' },
-    { label: 'ドリンク', childId: '4', parentId: '1' },
-    { label: 'その他', childId: '5', parentId: '1' },
-    { label: '書籍', childId: '6', parentId: '2' },
-  ]
-
-  /** 親を選択された時、表示する子データを抽出 */
-  selectParentId(val: string) {
-    this.parentId = val
-    // childBaseDataのparentIdがthis.parentIdと一致する配列のみchildDataに入れる
-    this.childData = this.childBaseData.filter((data) => {
-      return data.parentId === this.parentId
-    })
-  }
+  /** 子カテゴリデータ */
+  childData: any[] = []
 
   /** 親カテゴリIDから名前を取得 */
   getParentName(id: string): string {
     if (id === '') {
       return ''
     }
-    return this.parentData.filter((data) => {
-      return data.parentId === id
-    })[0].label
+    let name: string = ''
+    this.parentData.forEach((data) => {
+      if (data.id === id) {
+        name = data.name
+      }
+    })
+    return name
   }
 
   /** 子カテゴリIDから名前を取得 */
   getChildName(id: string): string {
-    if (id === '') {
-      return ''
-    }
-    return (
-      this.$t('common.colon') +
-      this.childBaseData.filter((data) => {
-        return data.childId === id
-      })[0].label
-    )
+    console.log(id)
+    // if (id === '') {
+    //   return ''
+    // }
+    // return (
+    //   this.$t('common.colon') +
+    //   this.childBaseData.filter((data) => {
+    //     return data.childId === id
+    //   })[0].label
+    // )
+  }
+
+  /** 親を選択された時、表示する子データを抽出 */
+  selectParentId(val: string) {
+    categoryStore.fetchChildCategoryList(val)
+    this.childData = categoryStore.getChildCategoryList
+    this.parentId = val
   }
 
   /** 子データを選択されたとき */
@@ -190,16 +178,17 @@ export default class paymentDetail extends Vue {
 
   /** 収支カードの×を押されたとき */
   close(listNo: number) {
-    this.paymentDataList.splice(listNo, 1, {
-      parentId: '',
-      childId: '',
-      amount: 0,
-      paymentFlag: null,
-    })
+    this.paymentDataList.splice(listNo, 1)
   }
 
+  /** 画面表示時 */
   created() {
+    this.childData = [{ label: '', childId: '', parentId: '' }]
+    // カテゴリ情報を取得
+    categoryStore.fetchCategoryList()
+    this.parentData = categoryStore.getParentCategoryList
     if (this.$route.query.target === null) {
+      this.isPay = true
       // 日付が渡されなかったら今日の日付を選択する
       this.date = moment().format('yyyy-MM-DD')
     } else {
@@ -207,25 +196,25 @@ export default class paymentDetail extends Vue {
       this.date = this.$route.query.target.toString()
       // 日付で検索を掛けて収支詳細を取得
       this.paymentDataList = [
-        { parentId: '2', childId: '6', amount: 2200, paymentFlag: true },
-        { parentId: '1', childId: '3', amount: 500, paymentFlag: true },
-        { parentId: '3', childId: '', amount: 800, paymentFlag: true },
-        { parentId: '', childId: '', amount: 100, paymentFlag: true },
-        { parentId: '5', childId: '', amount: 800, paymentFlag: false },
+        { parentId: '2', childId: '6', amount: 2200, isPay: true },
+        { parentId: '1', childId: '3', amount: 500, isPay: true },
+        { parentId: '3', childId: '', amount: 800, isPay: true },
+        { parentId: '', childId: '', amount: 100, isPay: true },
+        { parentId: '5', childId: '', amount: 800, isPay: false },
       ]
     }
   }
 
   addPaymentList() {
     console.log('金額は' + this.amount)
-    console.log('true=支出、false=収入→' + this.paymentFlag)
+    console.log('true=支出、false=収入→' + this.isPay)
     console.log('カテゴリ大は' + this.parentId)
     console.log('カテゴリ小は' + this.childId)
     const inputData = {
       parentId: this.parentId,
       childId: this.childId,
       amount: this.amount,
-      paymentFlag: this.paymentFlag,
+      isPay: this.isPay,
     }
     this.paymentDataList.push(inputData)
   }
@@ -240,7 +229,7 @@ export default class paymentDetail extends Vue {
   }
 
   onChange(eventVal: boolean) {
-    this.paymentFlag = eventVal
+    this.isPay = eventVal
     this.parentId = ''
   }
 }

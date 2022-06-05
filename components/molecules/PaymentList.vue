@@ -26,7 +26,7 @@ export default class paymentList extends Vue {
   amount!: number
 
   @Prop({ type: Boolean, required: true })
-  paymentFlag!: boolean
+  isPay!: boolean
 
   @Prop({ type: Number, required: true })
   listNo!: Number
@@ -34,7 +34,7 @@ export default class paymentList extends Vue {
   color: string = 'green'
 
   created() {
-    this.paymentFlag ? (this.color = 'red') : (this.color = 'green')
+    this.isPay ? (this.color = 'red') : (this.color = 'green')
   }
 
   close() {

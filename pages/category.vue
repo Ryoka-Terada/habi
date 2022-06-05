@@ -5,28 +5,20 @@
     </v-container>
     <v-tabs v-model="tab">
       <v-tab v-for="(category, i) in categories" :key="i">
-        {{ category.paymentName }}
+        {{ category }}
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab">
       <!-- 支出タブの中身 -->
       <v-tab-item>
-        <div v-for="(data, i) in datas" :key="i">
-          <CategoryTable
-            v-if="data.paymentFlag == tab"
-            :parent="data.parent"
-            :childs="data.childs"
-          />
+        <div v-for="(data, i) in payDatas" :key="i">
+          <CategoryTable :parent="data.parent" :childs="data.childs" />
         </div>
       </v-tab-item>
       <!-- 収入タブの中身 -->
       <v-tab-item>
-        <div v-for="(data, i) in datas" :key="i">
-          <CategoryTable
-            v-if="data.paymentFlag == tab"
-            :parent="data.parent"
-            :childs="data.childs"
-          />
+        <div v-for="(data, i) in incomeDatas" :key="i">
+          <CategoryTable :parent="data.parent" :childs="data.childs" />
         </div>
       </v-tab-item>
     </v-tabs-items>
@@ -35,40 +27,56 @@
 
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
+import { categoryStore } from '../store'
 @Component
 export default class Category extends Vue {
-  tab: any = null
-  disabled: boolean = true
-  categories = [
-    {
-      paymentName: '支出',
-      paymentFlag: 0,
-    },
-    {
-      paymentName: '収入',
-      paymentFlag: 1,
-    },
-  ]
+  tabPay = true
+  tabIncome = false
+  tab: any = this.tabPay
+  categories = [this.$t('common.pay'), this.$t('common.income')]
 
-  datas = [
-    {
-      parentId: 3,
-      parent: '仕事',
-      childs: ['副業', '給料'],
-      paymentFlag: 1,
-    },
-    {
-      parentId: 1,
-      parent: '食費',
-      childs: ['ランチ', 'ディナー'],
-      paymentFlag: 0,
-    },
-    {
-      parentId: 2,
-      parent: '趣味',
-      childs: ['書籍'],
-      paymentFlag: 0,
-    },
-  ]
+  payDatas!: { parentId: string; parent: string; childs: string[] }[]
+  incomeDatas!: { parentId: string; parent: string; childs: string[] }[]
+
+  /**
+   * 初期表示時、親カテゴリと子カテゴリの情報を取得
+   */
+  created() {
+    categoryStore.fetchCategoryList()
+    const payDatas: {
+      parentId: string
+      parent: string
+      childs: string[]
+    }[] = []
+    const incomeDatas: {
+      parentId: string
+      parent: string
+      childs: string[]
+    }[] = []
+    categoryStore.getParentCategoryList.forEach((parentCategory) => {
+      const id = parentCategory.id
+      const childList: string[] = []
+      categoryStore.getChildCategoryList.forEach((childCategory) => {
+        if (id === childCategory.parentId) {
+          childList.push(childCategory.name)
+        }
+      })
+      if (parentCategory.isPay) {
+        payDatas.push({
+          parentId: id,
+          parent: parentCategory.name,
+          childs: childList,
+        })
+      } else {
+        incomeDatas.push({
+          parentId: id,
+          parent: parentCategory.name,
+          childs: childList,
+        })
+      }
+    })
+    this.payDatas = payDatas
+    this.incomeDatas = incomeDatas
+  }
 }
 </script>

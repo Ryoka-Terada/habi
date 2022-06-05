@@ -12,13 +12,8 @@
         @change="childId"
       >
         <div v-for="(category, i) in data" :key="i">
-          <v-btn
-            v-if="parentId === category.parentId"
-            small
-            class="ma-2"
-            :value="category.childId"
-          >
-            {{ category.label }}:{{ selectVal }}
+          <v-btn small class="ma-2" :value="category.id">
+            {{ category.name }}:{{ selectVal }}
           </v-btn>
         </div>
       </v-btn-toggle>
@@ -31,19 +26,16 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 @Component
 export default class ButtonGroupMini extends Vue {
-  @Prop({ type: String, required: false })
-  parentId!: string
-
   @Prop({ type: Array, required: false })
-  data!: { label: string; childId: string; parentId: string }[]
+  data!: { id: string; name: string; parentId: string }[]
 
   @Prop({ type: Boolean, required: true })
-  paymentFlag!: boolean
+  isPay!: boolean
 
   selectVal: string = ''
 
   get color(): string {
-    return this.paymentFlag ? 'red' : 'green'
+    return this.isPay ? 'red' : 'green'
   }
 
   childId() {
