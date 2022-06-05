@@ -25,6 +25,12 @@ export default class CategoryModule extends VuexModule {
   private childCategoryList: ChildCategory[] = []
 
   /**
+   * 子カテゴリ一覧(親カテゴリ指定)
+   * @type {ChildCategory[]}
+   */
+  private selectChildCategoryList: ChildCategory[] = []
+
+  /**
    * 親カテゴリ一覧を返す
    * @return {ParentCategory[]}
    */
@@ -40,14 +46,13 @@ export default class CategoryModule extends VuexModule {
     return this.childCategoryList
   }
 
-  // /**
-  //  * 親カテゴリを指定された子カテゴリ一覧を返す
-  //  * @return {ChildCategory[]}
-  //  */
-  // get getChildCategory(parentId: string): ChildCategory[] {
-  //   console.log(parentId)
-  //   return this.childCategoryList
-  // }
+  /**
+   * 子カテゴリ一覧を返す
+   * @return {ChildCategory[]}
+   */
+  get getSelectChildCategoryList(): ChildCategory[] {
+    return this.selectChildCategoryList
+  }
 
   /**
    * 親カテゴリ一覧を取得
@@ -63,24 +68,14 @@ export default class CategoryModule extends VuexModule {
     this.setParentCategoryList(categoryList)
     this.fetchChildCategoryList()
   }
-  // @Action
-  // fetchParentCategoryList() {
-  //   // ここでバックエンドから親カテゴリを取得してくる
-  //   const categoryList: ParentCategory[] = [
-  //     { id: '1', name: '食費', isPay: true },
-  //     { id: '2', name: '趣味', isPay: true },
-  //     { id: '3', name: '給料', isPay: false },
-  //   ]
-  //   this.setParentCategoryList(categoryList)
-  // }
 
   /**
    * 子カテゴリ一覧を取得
    */
   @Action
-  fetchChildCategoryList(parentId?: string) {
+  fetchChildCategoryList() {
     // ここでバックエンドから親カテゴリを取得してくる
-    let categoryList: ChildCategory[] = [
+    const categoryList: ChildCategory[] = [
       { id: '1a', name: 'ランチ', parentId: '1' },
       { id: '1b', name: 'ディナー', parentId: '1' },
       { id: '1c', name: 'おやつ', parentId: '1' },
@@ -88,25 +83,19 @@ export default class CategoryModule extends VuexModule {
       { id: '3a', name: '仕事', parentId: '3' },
       { id: '3b', name: '副業', parentId: '3' },
     ]
-    if (parentId != null) {
-      categoryList = categoryList.filter((data) => {
-        return data.parentId === parentId
-      })
-    }
     this.setChildCategoryList(categoryList)
   }
-  // fetchChildCategoryList() {
-  //   // ここでバックエンドから親カテゴリを取得してくる
-  //   const categoryList: ChildCategory[] = [
-  //     { id: '1a', name: 'ランチ', parentId: '1' },
-  //     { id: '1b', name: 'ディナー', parentId: '1' },
-  //     { id: '1c', name: 'おやつ', parentId: '1' },
-  //     { id: '2a', name: '書籍', parentId: '2' },
-  //     { id: '3a', name: '仕事', parentId: '3' },
-  //     { id: '3b', name: '副業', parentId: '3' },
-  //   ]
-  //   this.setChildCategoryList(categoryList)
-  // }
+
+  /**
+   * 子カテゴリ一覧(親カテゴリ指定)を取得
+   */
+  @Action
+  fetchSelectChildCategoryList(parentId: string) {
+    const selectChildCategoryList = this.childCategoryList.filter((data) => {
+      return data.parentId === parentId
+    })
+    this.setSelectChildCategoryList(selectChildCategoryList)
+  }
 
   /**
    * 親カテゴリ一覧をセット
@@ -122,5 +111,13 @@ export default class CategoryModule extends VuexModule {
   @Mutation
   setChildCategoryList(list: ChildCategory[]) {
     this.childCategoryList = list
+  }
+
+  /**
+   * 子カテゴリ一覧(親カテゴリ指定)をセット
+   */
+  @Mutation
+  setSelectChildCategoryList(list: ChildCategory[]) {
+    this.selectChildCategoryList = list
   }
 }

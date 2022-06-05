@@ -38,25 +38,13 @@
                 <PaymentList
                   :label="
                     getParentName(paymentData.parentId) +
-                    '：' +
-                    paymentData.childId
+                    getChildName(paymentData.childId)
                   "
                   :amount="paymentData.amount"
                   :is-pay="paymentData.isPay"
                   :list-no="i"
                   @close="close"
                 />
-                <!-- <PaymentList
-                  v-if="paymentData.isPay !== null"
-                  :label="
-                    getParentName(paymentData.parentId) +
-                    getChildName(paymentData.childId)
-                  "
-                  :amount="paymentData.amount"
-                  :payment-flag="paymentData.isPay"
-                  :list-no="i"
-                  @close="close"
-                /> -->
               </div>
             </v-col>
           </v-row>
@@ -152,22 +140,22 @@ export default class paymentDetail extends Vue {
 
   /** 子カテゴリIDから名前を取得 */
   getChildName(id: string): string {
-    console.log(id)
-    // if (id === '') {
-    //   return ''
-    // }
-    // return (
-    //   this.$t('common.colon') +
-    //   this.childBaseData.filter((data) => {
-    //     return data.childId === id
-    //   })[0].label
-    // )
+    if (id === '') {
+      return ''
+    }
+    let name: string = ''
+    categoryStore.getChildCategoryList.forEach((data) => {
+      if (data.id === id) {
+        name = data.name
+      }
+    })
+    return this.$t('common.colon') + name
   }
 
   /** 親を選択された時、表示する子データを抽出 */
   selectParentId(val: string) {
-    categoryStore.fetchChildCategoryList(val)
-    this.childData = categoryStore.getChildCategoryList
+    categoryStore.fetchSelectChildCategoryList(val)
+    this.childData = categoryStore.getSelectChildCategoryList
     this.parentId = val
   }
 
@@ -196,11 +184,10 @@ export default class paymentDetail extends Vue {
       this.date = this.$route.query.target.toString()
       // 日付で検索を掛けて収支詳細を取得
       this.paymentDataList = [
-        { parentId: '2', childId: '6', amount: 2200, isPay: true },
-        { parentId: '1', childId: '3', amount: 500, isPay: true },
-        { parentId: '3', childId: '', amount: 800, isPay: true },
+        { parentId: '2', childId: '2a', amount: 2200, isPay: true },
+        { parentId: '1', childId: '1c', amount: 500, isPay: true },
+        { parentId: '3', childId: '3a', amount: 800, isPay: false },
         { parentId: '', childId: '', amount: 100, isPay: true },
-        { parentId: '5', childId: '', amount: 800, isPay: false },
       ]
     }
   }
