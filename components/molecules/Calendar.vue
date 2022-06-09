@@ -36,10 +36,10 @@
             <v-container>
               <div v-for="(payment, i) in payments" :key="i">
                 <v-row v-if="payment.date == date">
-                  <p v-if="payment.paymentFrag" class="text-income">
+                  <p v-if="payment.isPay" class="text-pay">
                     {{ $t('common.plus') }}{{ payment.amount }}
                   </p>
-                  <p v-else class="text-pay">
+                  <p v-else class="text-income">
                     {{ $t('common.minus') }}{{ payment.amount }}
                   </p>
                 </v-row>
@@ -59,10 +59,10 @@ import moment from 'moment'
 @Component
 export default class Calendar extends Vue {
   @Prop({ type: Array, required: true })
-  payments!: { amount: number; paymentFrag: number; date: string }[]
+  payments!: { amount: number; isPay: boolean; date: string }[]
 
-  @Prop({ type: Number, required: true })
-  amountPay!: number
+  // @Prop({ type: Number, required: true })
+  amountPay: number = 0
 
   weekend: number[] = [0, 6]
 
@@ -75,6 +75,17 @@ export default class Calendar extends Vue {
   show(date: string) {
     // paymentDetail?target=[yyyy-MM-dd] で遷移
     this.$router.push({ path: 'paymentDetail', query: { target: date } })
+  }
+
+  created() {
+    // 月の合計支出額を計算
+    let amountPay = 0
+    this.payments.forEach((payment) => {
+      payment.isPay
+        ? (amountPay = amountPay + payment.amount)
+        : (amountPay = amountPay + 0)
+    })
+    this.amountPay = amountPay
   }
 }
 </script>

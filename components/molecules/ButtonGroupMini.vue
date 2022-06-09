@@ -13,7 +13,7 @@
       >
         <div v-for="(category, i) in data" :key="i">
           <v-btn small class="ma-2" :value="category.id">
-            {{ category.name }}:{{ selectVal }}
+            {{ category.name }}
           </v-btn>
         </div>
       </v-btn-toggle>

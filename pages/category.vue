@@ -28,6 +28,11 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 import { categoryStore } from '../store'
+export interface CategoryList {
+  parentId: string
+  parent: string
+  childs: string[]
+}
 @Component
 export default class Category extends Vue {
   tabPay = true
@@ -43,16 +48,8 @@ export default class Category extends Vue {
    */
   created() {
     categoryStore.fetchCategoryList()
-    const payDatas: {
-      parentId: string
-      parent: string
-      childs: string[]
-    }[] = []
-    const incomeDatas: {
-      parentId: string
-      parent: string
-      childs: string[]
-    }[] = []
+    const payDatas: CategoryList[] = []
+    const incomeDatas: CategoryList[] = []
     categoryStore.getParentCategoryList.forEach((parentCategory) => {
       const id = parentCategory.id
       const childList: string[] = []
