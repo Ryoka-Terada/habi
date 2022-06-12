@@ -61,9 +61,7 @@ export default class Calendar extends Vue {
   @Prop({ type: Array, required: true })
   payments!: { amount: number; isPay: boolean; date: string }[]
 
-  /**
-   * 関数用
-   */
+  /** 関数用 */
   $refs: any
 
   amountPay: number = 0

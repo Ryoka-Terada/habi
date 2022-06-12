@@ -24,7 +24,11 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@plugins/toggle.js', '@plugins/i18n.ts'],
+  plugins: [
+    '@plugins/toggle.js',
+    '@plugins/i18n.ts',
+    '@plugins/vee-validate.js',
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   // components: true,

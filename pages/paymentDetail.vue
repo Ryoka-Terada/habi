@@ -1,111 +1,121 @@
 <template>
   <div>
     <v-card class="overflow-hidden">
-      <v-app-bar absolute bottom elevate-on-scroll color="white" tile>
-        <v-tabs fixed-tabs>
-          <v-col
-            class="cancel d-flex justify-center align-center"
-            @click="updateData"
-          >
-            {{ $t('common.cancel') }}
-          </v-col>
-          <v-col
-            v-if="isRegist"
-            class="regist d-flex justify-center align-center"
-            @click="registData"
-          >
-            {{ $t('common.regist') }}
-          </v-col>
-          <v-col
-            v-else
-            class="regist d-flex justify-center align-center"
-            @click="updateData"
-          >
-            <div>
-              {{ $t('common.update') }}
-            </div>
-          </v-col>
-        </v-tabs>
-      </v-app-bar>
-      <v-sheet id="scrolling" class="overflow-y-auto" max-height="850">
-        <v-container style="height: 1000px">
-          <v-row align="center">
-            <v-col cols="8" class="ml-3">
-              <DatePicker :date="listItem.date" @changeDate="changeDate" />
+      <validation-observer ref="obs" v-slot="ObserverProps">
+        <v-app-bar absolute bottom elevate-on-scroll color="white" tile>
+          <v-tabs fixed-tabs>
+            <v-col
+              class="cancel d-flex justify-center align-center"
+              @click="updateData"
+            >
+              {{ $t('common.cancel') }}
             </v-col>
-            <v-col cols="3" class="d-flex justify-center">
-              <Toggle
-                :value="listItem.isPay"
-                :uncheck="$t('common.pay')"
-                :check="$t('common.income')"
-                @onChange="onChange"
-              />
+            <v-col
+              v-if="isRegist"
+              class="regist d-flex justify-center align-center"
+              @click="registData"
+            >
+              {{ $t('common.regist') }}
             </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <div v-for="(paymentData, i) in paymentDataList" :key="i">
-                <PaymentList
-                  :label="
-                    getParentName(paymentData.parentId) +
-                    getChildName(paymentData.childId)
-                  "
-                  :amount="paymentData.amount"
-                  :is-pay="paymentData.isPay"
-                  :list-no="i"
-                  @close="close"
-                />
+            <v-col
+              v-else
+              class="regist d-flex justify-center align-center"
+              @click="updateData"
+            >
+              <div>
+                {{ $t('common.update') }}
               </div>
             </v-col>
-          </v-row>
-          <v-row align="center">
-            <v-col cols="9" class="mx-3">
-              <v-text-field v-model="listItem.amount"></v-text-field>
-            </v-col>
-            <v-col cols="1">{{ $t('common.yen') }}</v-col>
-          </v-row>
-          <v-row class="mx-3">
-            <v-sheet height="45">
-              <ButtonGroupMini
-                v-if="listItem.parentId"
-                :data="selectChildData"
+          </v-tabs>
+        </v-app-bar>
+        <v-sheet id="scrolling" class="overflow-y-auto" max-height="850">
+          <v-container style="height: 1000px">
+            <v-row align="center">
+              <v-col cols="8" class="ml-3">
+                <DatePicker :date="listItem.date" @changeDate="changeDate" />
+              </v-col>
+              <v-col cols="3" class="d-flex justify-center">
+                <Toggle
+                  :value="listItem.isPay"
+                  :uncheck="$t('common.pay')"
+                  :check="$t('common.income')"
+                  @onChange="onChange"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <div v-for="(paymentData, i) in paymentDataList" :key="i">
+                  <PaymentList
+                    :label="
+                      getParentName(paymentData.parentId) +
+                      getChildName(paymentData.childId)
+                    "
+                    :amount="paymentData.amount"
+                    :is-pay="paymentData.isPay"
+                    :list-no="i"
+                    @close="close"
+                  />
+                </div>
+              </v-col>
+            </v-row>
+            <v-row align="center">
+              <v-col cols="9" class="mx-3">
+                <validation-provider
+                  v-slot="{ errors }"
+                  rules="required|numeric"
+                  :name="$t('common.amount')"
+                >
+                  <v-text-field v-model="listItem.amount" />
+                  <p>{{ errors[0] }}</p>
+                </validation-provider>
+              </v-col>
+              <v-col cols="1">{{ $t('common.yen') }}</v-col>
+            </v-row>
+            <v-row class="mx-3">
+              <v-sheet height="45">
+                <ButtonGroupMini
+                  v-if="listItem.parentId"
+                  :data="selectChildData"
+                  :is-pay="listItem.isPay"
+                  @childId="selectChildId"
+                />
+              </v-sheet>
+            </v-row>
+            <v-row class="mx-3">
+              <ButtonGroup
+                :data="parentData"
                 :is-pay="listItem.isPay"
-                @childId="selectChildId"
+                @parentId="selectParentId"
               />
-            </v-sheet>
-          </v-row>
-          <v-row class="mx-3">
-            <ButtonGroup
-              :data="parentData"
-              :is-pay="listItem.isPay"
-              @parentId="selectParentId"
-            />
-          </v-row>
-          <v-row class="mr-3">
-            <v-spacer />
-            <v-btn
-              x-small
-              fab
-              color="green"
-              elevation="1"
-              @click="addPaymentList"
+            </v-row>
+            <v-row class="mr-3">
+              <v-spacer />
+              <v-btn
+                x-small
+                fab
+                color="green"
+                elevation="1"
+                :disabled="ObserverProps.invalid"
+                @click="addPaymentList"
+              >
+                <v-icon color="white"> mdi-plus </v-icon>
+              </v-btn></v-row
             >
-              <v-icon color="white"> mdi-plus </v-icon>
-            </v-btn></v-row
-          >
-          <v-row>
-            <v-col cols="11" class="mx-3">
-              <v-textarea
-                :placeholder="$t('common.memo') + '※まだ機能作ってない'"
-              ></v-textarea>
-              <v-checkbox
-                class="mt-0"
-                :label="$t('discription.displayOnly', [$t('common.memo')])"
-              ></v-checkbox>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-sheet>
+            <v-row>
+              <v-col cols="11" class="mx-3">
+                <v-textarea
+                  :placeholder="$t('common.memo') + '※まだ機能作ってない'"
+                ></v-textarea>
+                <v-checkbox
+                  class="mt-0"
+                  :label="$t('discription.displayOnly', [$t('common.memo')])"
+                ></v-checkbox>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-sheet>
+      </validation-observer>
     </v-card>
   </div>
 </template>
