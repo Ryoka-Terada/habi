@@ -10,9 +10,14 @@
         :key="i"
         class="pl-3"
       >
-        <v-col>{{ categoryAmount.category }}</v-col>
+        <v-col>{{ categoryAmount.name }}</v-col>
         <v-spacer />
-        <v-col>{{ categoryAmount.amount }}{{ $t('common.yen') }}</v-col>
+        <v-col v-if="categoryAmount.isPay" class="text-pay">
+          {{ categoryAmount.amount }}{{ $t('common.yen') }}
+        </v-col>
+        <v-col v-else-if="!categoryAmount.isPay" class="text-income">
+          {{ categoryAmount.amount }}{{ $t('common.yen') }}
+        </v-col>
         <v-col></v-col>
       </v-row>
     </v-container>
@@ -35,16 +40,28 @@ export default class Index extends Vue {
   payments: { amount: number; isPay: boolean; date: string }[] = []
 
   /** カテゴリ内訳 */
-  categoryAmounts: { category: string; amount: number }[] = [
-    { category: '食費', amount: 99999 },
-    { category: '趣味', amount: 99999 },
-    { category: 'その他', amount: 99999 },
-  ]
+  categoryAmounts: {
+    parentId: string
+    name: string
+    isPay: boolean
+    amount: number
+  }[] = []
 
   created() {
     // 月の収支一覧を取得
     calendarStore.fetchMonthPaymentList('6')
     this.payments = calendarStore.getMonthPaymentList
+    calendarStore.fetchMonthCategorySummary('6')
+    this.categoryAmounts = calendarStore.getMonthCategorySummary
   }
 }
 </script>
+
+<style scoped>
+.text-pay {
+  color: red;
+}
+.text-income {
+  color: green;
+}
+</style>

@@ -2,13 +2,13 @@
   <div>
     <v-row align="center" justify="center">
       <v-col cols="auto">
-        <v-btn color="primary" @click="$refs.calendar.prev()"
+        <v-btn color="primary" @click="prevMonth"
           ><v-icon>mdi-arrow-left-bold-outline</v-icon></v-btn
         >
       </v-col>
       <v-col cols="auto">{{ title }}</v-col>
       <v-col cols="auto">
-        <v-btn color="primary" @click="$refs.calendar.next()"
+        <v-btn color="primary" @click="nextMonth"
           ><v-icon>mdi-arrow-right-bold-outline</v-icon></v-btn
         >
       </v-col>
@@ -37,10 +37,10 @@
               <div v-for="(payment, i) in payments" :key="i">
                 <v-row v-if="payment.date == date">
                   <p v-if="payment.isPay" class="text-pay">
-                    {{ $t('common.plus') }}{{ payment.amount }}
+                    {{ $t('common.minus') }}{{ payment.amount }}
                   </p>
                   <p v-else class="text-income">
-                    {{ $t('common.minus') }}{{ payment.amount }}
+                    {{ $t('common.plus') }}{{ payment.amount }}
                   </p>
                 </v-row>
               </div>
@@ -61,7 +61,11 @@ export default class Calendar extends Vue {
   @Prop({ type: Array, required: true })
   payments!: { amount: number; isPay: boolean; date: string }[]
 
-  // @Prop({ type: Number, required: true })
+  /**
+   * 関数用
+   */
+  $refs: any
+
   amountPay: number = 0
 
   weekend: number[] = [0, 6]
@@ -86,6 +90,16 @@ export default class Calendar extends Vue {
         : (amountPay = amountPay + 0)
     })
     this.amountPay = amountPay
+  }
+
+  nextMonth() {
+    // ここで親のカテゴリ合計取得メソッドとかを動かす
+    this.$refs.calendar.next()
+  }
+
+  prevMonth() {
+    // ここで親のカテゴリ合計取得メソッドとかを動かす
+    this.$refs.calendar.prev()
   }
 }
 </script>

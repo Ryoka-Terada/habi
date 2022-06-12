@@ -47,7 +47,7 @@ export default class Category extends Vue {
    * 初期表示時、親カテゴリと子カテゴリの情報を取得
    */
   created() {
-    categoryStore.fetchCategoryList()
+    categoryStore.fetchParentCategoryList()
     const payDatas: CategoryList[] = []
     const incomeDatas: CategoryList[] = []
     categoryStore.getParentCategoryList.forEach((parentCategory) => {

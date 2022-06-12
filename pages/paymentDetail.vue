@@ -155,7 +155,7 @@ export default class paymentDetail extends Vue {
   /** 画面表示時 */
   created() {
     // カテゴリ情報(マスタ)を取得
-    categoryStore.fetchCategoryList()
+    categoryStore.fetchParentCategoryList()
     this.parentData = categoryStore.getParentCategoryList
     this.listItem.isPay = true
     if (this.$route.query.target === null) {

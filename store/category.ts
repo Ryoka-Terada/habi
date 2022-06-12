@@ -58,7 +58,7 @@ export default class CategoryModule extends VuexModule {
    * 親カテゴリ一覧を取得
    */
   @Action
-  fetchCategoryList() {
+  fetchParentCategoryList() {
     // ここでバックエンドから親カテゴリを取得してくる
     const categoryList: ParentCategory[] = [
       { id: '1', name: '食費', isPay: true },
@@ -74,7 +74,7 @@ export default class CategoryModule extends VuexModule {
    */
   @Action
   fetchChildCategoryList() {
-    // ここでバックエンドから親カテゴリを取得してくる
+    // ここでバックエンドから子カテゴリを取得してくる
     const categoryList: ChildCategory[] = [
       { id: '1a', name: 'ランチ', parentId: '1' },
       { id: '1b', name: 'ディナー', parentId: '1' },

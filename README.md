@@ -1,3 +1,15 @@
+# インスタント家計簿アプリのフロントエンドです
+
+## 使用技術(フレームワークやプラグインなど)
+
+- Nuxt.js
+- Typescript
+- Vuetify
+- Vuex
+- i18n
+
+etc...
+
 # front
 
 ## Build Setup

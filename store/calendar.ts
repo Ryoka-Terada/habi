@@ -5,6 +5,7 @@ import {
   Action,
   config,
 } from 'vuex-module-decorators'
+import { categoryStore } from '../store'
 
 config.rawError = true
 
@@ -19,7 +20,12 @@ export default class CalendarModule extends VuexModule {
   /**
    * 月の収支カテゴリ合計
    */
-  private monthCategorySummary: any = []
+  private monthCategorySummary: {
+    parentId: string
+    name: string
+    isPay: boolean
+    amount: number
+  }[] = []
 
   /**
    * 月の収支一覧を返す
@@ -35,7 +41,12 @@ export default class CalendarModule extends VuexModule {
   /**
    * 月の収支カテゴリ合計を返す
    */
-  get getMonthCategorySummary(): [] {
+  get getMonthCategorySummary(): {
+    parentId: string
+    name: string
+    isPay: boolean
+    amount: number
+  }[] {
     return this.monthCategorySummary
   }
 
@@ -59,7 +70,33 @@ export default class CalendarModule extends VuexModule {
    */
   @Action
   fetchMonthCategorySummary(month: string) {
-    console.log(month + '月の収支カテゴリ合計を取得')
+    console.log(month + '月の収支カテゴリ合計を取得(※便宜的に６月を返す)')
+    // 親カテゴリを取得
+    categoryStore.fetchParentCategoryList()
+    const categories = categoryStore.getParentCategoryList
+    // 各親カテゴリにその月の合計額を追加
+    const categorySummary: {
+      parentId: string
+      name: string
+      isPay: boolean
+      amount: number
+    }[] = []
+    categories.forEach((category) => {
+      const amount = {
+        parentId: category.id,
+        name: category.name,
+        isPay: category.isPay,
+        amount: 99999, // ここの合計はバックエンドから取って来る
+      }
+      categorySummary.push(amount)
+    })
+    /**
+     * テストデータの期待値
+     *   { parentId: '1', name: '食費', isPay: true, amount: 99999 },
+     *   { parentId: '2', name: '趣味', isPay: true, amount: 99999 },
+     *   { parentId: '3', name: '給料', isPay: false, amount: 99999 },
+     */
+    this.setMonthCategorySummary(categorySummary)
   }
 
   /**
@@ -76,7 +113,14 @@ export default class CalendarModule extends VuexModule {
    * 月の収支カテゴリ合計をセット
    */
   @Mutation
-  setMonthCategorySummary(list: []) {
+  setMonthCategorySummary(
+    list: {
+      parentId: string
+      name: string
+      isPay: boolean
+      amount: number
+    }[]
+  ) {
     this.monthCategorySummary = list
   }
 }
