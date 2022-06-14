@@ -3,5 +3,4 @@ export interface PaymentDetail {
   childId: string
   amount: number
   isPay: boolean
-  date: string
 }

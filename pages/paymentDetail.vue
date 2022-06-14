@@ -29,10 +29,10 @@
           </v-tabs>
         </v-app-bar>
         <v-sheet id="scrolling" class="overflow-y-auto" max-height="850">
-          <v-container style="height: 1000px">
+          <v-container style="height: 930px">
             <v-row align="center">
               <v-col cols="8" class="ml-3">
-                <DatePicker :date="listItem.date" @changeDate="changeDate" />
+                <DatePicker :date="date" @changeDate="changeDate" />
               </v-col>
               <v-col cols="3" class="d-flex justify-center">
                 <Toggle
@@ -66,7 +66,11 @@
                   rules="required|numeric"
                   :name="$t('common.amount')"
                 >
-                  <v-text-field v-model="listItem.amount" />
+                  <v-text-field
+                    v-model="listItem.amount"
+                    type="Number"
+                    clearable
+                  />
                   <p>{{ errors[0] }}</p>
                 </validation-provider>
               </v-col>
@@ -130,13 +134,15 @@ import { ChildCategory } from '../types/childCategory'
 
 @Component
 export default class paymentDetail extends Vue {
+  /** 詳細情報を出す日付 */
+  date: string = ''
+
   /** 入力フォーム(収支カード) */
   listItem: PaymentDetail = {
     parentId: '',
     childId: '',
     amount: 0,
     isPay: true,
-    date: '',
   }
 
   /** 入力フォーム初期化 */
@@ -146,7 +152,6 @@ export default class paymentDetail extends Vue {
       childId: '',
       amount: 0,
       isPay: true,
-      date: '',
     }
   }
 
@@ -170,12 +175,12 @@ export default class paymentDetail extends Vue {
     this.listItem.isPay = true
     if (this.$route.query.target === null) {
       // 日付が渡されなかったら今日の日付を選択する
-      this.listItem.date = moment().format('yyyy-MM-DD')
+      this.date = moment().format('yyyy-MM-DD')
       this.isRegist = true
     } else {
       const date = this.$route.query.target.toString()
       // パラメータの日付をセット
-      this.listItem.date = date
+      this.date = date
       this.selectDatePaymentDetail(date)
     }
   }
@@ -242,12 +247,11 @@ export default class paymentDetail extends Vue {
 
   /** 収支カードを追加されたとき */
   addPaymentList() {
-    const inputData = {
+    const inputData: PaymentDetail = {
       parentId: this.listItem.parentId,
       childId: this.listItem.childId,
-      amount: this.listItem.amount,
+      amount: parseInt(this.listItem.amount.toString(), 10),
       isPay: this.listItem.isPay,
-      date: this.listItem.date,
     }
     this.paymentDataList.push(inputData)
     this.initializeListItem()
@@ -267,7 +271,7 @@ export default class paymentDetail extends Vue {
 
   /** 日付を変更されたとき */
   changeDate(date: string) {
-    this.listItem.date = date
+    this.date = date
     this.selectDatePaymentDetail(date)
   }
 

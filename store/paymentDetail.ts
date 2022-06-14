@@ -37,23 +37,20 @@ export default class PaymentDetailModule extends VuexModule {
         childId: '2a',
         amount: 2200,
         isPay: true,
-        date: targetDate,
       },
       {
         parentId: '1',
         childId: '1b',
         amount: 500,
         isPay: true,
-        date: targetDate,
       },
       {
         parentId: '3',
         childId: '3a',
         amount: 800,
         isPay: false,
-        date: targetDate,
       },
-      { parentId: '', childId: '', amount: 100, isPay: true, date: targetDate },
+      { parentId: '', childId: '', amount: 100, isPay: true },
     ]
     this.setPaymentDetailList(paymentDetailList)
   }
