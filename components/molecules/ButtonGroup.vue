@@ -4,19 +4,18 @@
       <v-btn-toggle
         v-model="selectVal"
         class="overflow-x-auto"
-        borderless
-        tile
-        :color="color"
         @change="parentId"
       >
-        <v-btn
-          v-for="(category, i) in categorys"
-          :key="i"
-          class="ma-2"
-          :value="category.id"
-        >
-          {{ category.name }}
-        </v-btn>
+        <div v-for="(category, i) in categorys" :key="i">
+          <v-btn
+            class="ma-2"
+            rounded
+            :class="isPay ? 'pay--text' : 'income--text'"
+            :value="category.id"
+          >
+            {{ category.name }}
+          </v-btn>
+        </div>
       </v-btn-toggle>
     </div>
   </div>
@@ -34,10 +33,6 @@ export default class ButtonGroup extends Vue {
   isPay!: boolean
 
   selectVal: string = ''
-
-  get color(): string {
-    return this.isPay ? 'red' : 'green'
-  }
 
   get categorys(): { id: string; name: string; isPay: boolean }[] {
     return this.data.filter((data) => {

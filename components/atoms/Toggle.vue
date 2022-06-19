@@ -6,8 +6,8 @@
     :height="35"
     :font-size="20"
     :color="{
-      checked: 'green',
-      unchecked: 'red',
+      checked: '#75b1a9',
+      unchecked: '#ed8c72',
     }"
     @change="onChange($event.value)"
   />

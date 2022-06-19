@@ -2,7 +2,9 @@
   <div>
     <v-card tile flat class="mx-3">
       <v-list dense>
-        <v-subheader>{{ parent }}</v-subheader>
+        <v-subheader :class="isPay ? 'pay--text' : 'income--text'">
+          {{ parent }}
+        </v-subheader>
         <div>
           <v-list-item v-for="(child, i) in childs" :key="i">
             <v-text-field
@@ -13,9 +15,9 @@
         </div>
       </v-list>
       <v-container class="d-flex justify-end pa-1">
-        <v-btn fab small color="green" elevation="1" @click="edit()">
-          <v-icon v-if="readOnly" color="white" size="20">mdi-pencil</v-icon>
-          <v-icon v-else color="white" size="20">mdi-lock</v-icon>
+        <v-btn fab small elevation="3" @click="edit()">
+          <v-icon v-if="readOnly" color="primary" size="20">mdi-pencil</v-icon>
+          <v-icon v-else color="primary" size="20">mdi-lock</v-icon>
         </v-btn>
       </v-container>
     </v-card>
@@ -32,9 +34,10 @@ export default class CategoryTable extends Vue {
   @Prop({ type: Array, required: true })
   childs!: string[]
 
-  readOnly: boolean = true
+  @Prop({ type: Boolean, required: true })
+  isPay!: boolean
 
-  tmp!: string[]
+  readOnly: boolean = true
 
   edit() {
     this.readOnly = !this.readOnly

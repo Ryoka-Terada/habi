@@ -1,5 +1,5 @@
 <template>
-  <v-card :color="color" class="mb-2">
+  <v-card :class="isPay ? 'pay' : 'income'" class="mb-2">
     <v-card-actions>
       <v-row>
         <v-col cols="2">
@@ -30,12 +30,6 @@ export default class paymentList extends Vue {
 
   @Prop({ type: Number, required: true })
   listNo!: Number
-
-  color: string = 'green'
-
-  created() {
-    this.isPay ? (this.color = 'red') : (this.color = 'green')
-  }
 
   close() {
     this.$emit('close', this.listNo)

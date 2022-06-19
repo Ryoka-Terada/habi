@@ -12,10 +12,13 @@
       >
         <v-col>{{ categoryAmount.name }}</v-col>
         <v-spacer />
-        <v-col v-if="categoryAmount.isPay" class="text-pay">
+        <v-col v-if="categoryAmount.isPay" class="pay--text text--darken-1">
           {{ categoryAmount.amount }}{{ $t('common.yen') }}
         </v-col>
-        <v-col v-else-if="!categoryAmount.isPay" class="text-income">
+        <v-col
+          v-else-if="!categoryAmount.isPay"
+          class="income--text text--darken-1"
+        >
           {{ categoryAmount.amount }}{{ $t('common.yen') }}
         </v-col>
         <v-col></v-col>
@@ -56,12 +59,3 @@ export default class Index extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.text-pay {
-  color: red;
-}
-.text-income {
-  color: green;
-}
-</style>

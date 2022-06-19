@@ -3,16 +3,19 @@
     <div style="width: 350px">
       <v-btn-toggle
         v-model="selectVal"
-        dense
-        class="overflow-x-auto"
-        :background-color="color"
-        borderless
-        tile
-        :color="color"
+        class="overflow-x-auto pa-1"
+        rounded
+        :background-color="isPay ? 'pay lighten-1' : 'income lighten-1'"
         @change="childId"
       >
         <div v-for="(category, i) in data" :key="i">
-          <v-btn small class="ma-2" :value="category.id">
+          <v-btn
+            rounded
+            small
+            class="ma-2"
+            :class="isPay ? 'pay--text' : 'income--text'"
+            :value="category.id"
+          >
             {{ category.name }}
           </v-btn>
         </div>
@@ -33,10 +36,6 @@ export default class ButtonGroupMini extends Vue {
   isPay!: boolean
 
   selectVal: string = ''
-
-  get color(): string {
-    return this.isPay ? 'red' : 'green'
-  }
 
   childId() {
     this.$emit('childId', this.selectVal)

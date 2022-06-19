@@ -12,13 +12,21 @@
       <!-- 支出タブの中身 -->
       <v-tab-item>
         <div v-for="(data, i) in payDatas" :key="i">
-          <CategoryTable :parent="data.parent" :childs="data.childs" />
+          <CategoryTable
+            :parent="data.parent"
+            :childs="data.childs"
+            :is-pay="true"
+          />
         </div>
       </v-tab-item>
       <!-- 収入タブの中身 -->
       <v-tab-item>
         <div v-for="(data, i) in incomeDatas" :key="i">
-          <CategoryTable :parent="data.parent" :childs="data.childs" />
+          <CategoryTable
+            :parent="data.parent"
+            :childs="data.childs"
+            :is-pay="false"
+          />
         </div>
       </v-tab-item>
     </v-tabs-items>

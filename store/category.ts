@@ -79,6 +79,8 @@ export default class CategoryModule extends VuexModule {
       { id: '1a', name: 'ランチ', parentId: '1' },
       { id: '1b', name: 'ディナー', parentId: '1' },
       { id: '1c', name: 'おやつ', parentId: '1' },
+      { id: '1d', name: 'ドリンク', parentId: '1' },
+      { id: '1f', name: '朝食', parentId: '1' },
       { id: '2a', name: '書籍', parentId: '2' },
       { id: '3a', name: '仕事', parentId: '3' },
       { id: '3b', name: '副業', parentId: '3' },

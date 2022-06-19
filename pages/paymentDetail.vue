@@ -5,21 +5,21 @@
         <v-app-bar absolute bottom elevate-on-scroll color="white" tile>
           <v-tabs fixed-tabs>
             <v-col
-              class="cancel d-flex justify-center align-center"
+              class="secondary lighten-2 d-flex justify-center align-center"
               @click="updateData"
             >
               {{ $t('common.cancel') }}
             </v-col>
             <v-col
               v-if="isRegist"
-              class="regist d-flex justify-center align-center"
+              class="primary white--text d-flex justify-center align-center"
               @click="registData"
             >
               {{ $t('common.regist') }}
             </v-col>
             <v-col
               v-else
-              class="regist d-flex justify-center align-center"
+              class="primary white--text d-flex justify-center align-center"
               @click="updateData"
             >
               <div>
@@ -28,7 +28,7 @@
             </v-col>
           </v-tabs>
         </v-app-bar>
-        <v-sheet id="scrolling" class="overflow-y-auto" max-height="850">
+        <v-sheet class="overflow-y-auto" max-height="850">
           <v-container style="height: 930px">
             <v-row align="center">
               <v-col cols="8" class="ml-3">
@@ -36,6 +36,7 @@
               </v-col>
               <v-col cols="3" class="d-flex justify-center">
                 <Toggle
+                  ref="toggle"
                   :value="listItem.isPay"
                   :uncheck="$t('common.pay')"
                   :check="$t('common.income')"
@@ -77,7 +78,7 @@
               <v-col cols="1">{{ $t('common.yen') }}</v-col>
             </v-row>
             <v-row class="mx-3">
-              <v-sheet height="45">
+              <v-sheet height="53">
                 <ButtonGroupMini
                   v-if="listItem.parentId"
                   :data="selectChildData"
@@ -98,12 +99,11 @@
               <v-btn
                 x-small
                 fab
-                color="green"
-                elevation="1"
+                elevation="3"
                 :disabled="ObserverProps.invalid"
                 @click="addPaymentList"
               >
-                <v-icon color="white"> mdi-plus </v-icon>
+                <v-icon color="primary"> mdi-plus </v-icon>
               </v-btn></v-row
             >
             <v-row>
@@ -146,12 +146,12 @@ export default class paymentDetail extends Vue {
   }
 
   /** 入力フォーム初期化 */
-  initializeListItem() {
+  initializeListItem(ispay: boolean) {
     this.listItem = {
       parentId: '',
       childId: '',
       amount: 0,
-      isPay: true,
+      isPay: ispay,
     }
   }
 
@@ -166,6 +166,9 @@ export default class paymentDetail extends Vue {
 
   /** 子カテゴリデータ */
   selectChildData: ChildCategory[] = []
+
+  /** イベント取得用 */
+  $refs!: any
 
   /** 画面表示時 */
   created() {
@@ -254,7 +257,7 @@ export default class paymentDetail extends Vue {
       isPay: this.listItem.isPay,
     }
     this.paymentDataList.push(inputData)
-    this.initializeListItem()
+    this.initializeListItem(this.listItem.isPay)
   }
 
   /** 登録ボタンを押されたとき */
@@ -277,19 +280,7 @@ export default class paymentDetail extends Vue {
 
   /** 収支トグルを押されたとき */
   onChange(eventVal: boolean) {
-    this.initializeListItem()
     this.listItem.isPay = eventVal
   }
 }
 </script>
-
-<style scoped>
-.regist {
-  background-color: green;
-  color: white;
-}
-.cancel {
-  background-color: whitesmoke;
-  color: grey;
-}
-</style>

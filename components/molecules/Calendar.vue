@@ -24,7 +24,7 @@
         <template #day-label="{ day, weekday, date }">
           <p
             v-if="weekend.includes(weekday)"
-            class="text-pay"
+            class="red--text text--darken-1"
             @click="show(date)"
           >
             {{ day }}
@@ -36,10 +36,10 @@
             <v-container>
               <div v-for="(payment, i) in payments" :key="i">
                 <v-row v-if="payment.date == date">
-                  <p v-if="payment.isPay" class="text-pay">
+                  <p v-if="payment.isPay" class="pay--text text--darken-1">
                     {{ $t('common.minus') }}{{ payment.amount }}
                   </p>
-                  <p v-else class="text-income">
+                  <p v-else class="income--text text--darken-1">
                     {{ $t('common.plus') }}{{ payment.amount }}
                   </p>
                 </v-row>
@@ -101,12 +101,3 @@ export default class Calendar extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.text-pay {
-  color: red;
-}
-.text-income {
-  color: green;
-}
-</style>
