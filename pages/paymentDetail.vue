@@ -280,7 +280,7 @@ export default class paymentDetail extends Vue {
 
   /** 収支トグルを押されたとき */
   onChange(eventVal: boolean) {
-    this.listItem.isPay = eventVal
+    this.initializeListItem(eventVal)
   }
 }
 </script>
