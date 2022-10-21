@@ -4,7 +4,7 @@
       <v-btn-toggle
         v-model="selectVal"
         class="overflow-x-auto"
-        @change="parentId"
+        @change="select"
       >
         <div v-for="(category, i) in categorys" :key="i">
           <v-btn
@@ -27,7 +27,7 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 @Component
 export default class ButtonGroup extends Vue {
   @Prop({ type: Array, required: true })
-  data!: { id: string; name: string; isPay: boolean }[]
+  option!: { id: string; name: string; isPay: boolean }[]
 
   @Prop({ type: Boolean, required: true })
   isPay!: boolean
@@ -35,13 +35,13 @@ export default class ButtonGroup extends Vue {
   selectVal: string = ''
 
   get categorys(): { id: string; name: string; isPay: boolean }[] {
-    return this.data.filter((data) => {
+    return this.option.filter((data) => {
       return data.isPay === this.isPay
     })
   }
 
-  parentId() {
-    this.$emit('parentId', this.selectVal)
+  select() {
+    this.$emit('select', this.selectVal)
   }
 }
 </script>

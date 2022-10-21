@@ -44,6 +44,54 @@
                 />
               </v-col>
             </v-row>
+            <v-row align="center" class="pb-0">
+              <v-col cols="9" class="mx-3 pb-0">
+                <validation-provider
+                  v-slot="{ errors }"
+                  rules="required|numeric"
+                  :name="$t('common.amount')"
+                >
+                  <v-text-field
+                    v-model="listItem.amount"
+                    type="Number"
+                    clearable
+                  />
+                  <p>{{ errors[0] }}</p>
+                </validation-provider>
+              </v-col>
+              <v-col cols="1">{{ $t('common.yen') }}</v-col>
+            </v-row>
+            <v-row class="mx-3 mt-0">
+              <ButtonGroup
+                :option="parentData"
+                :is-pay="listItem.isPay"
+                @select="selectParentId"
+              />
+            </v-row>
+            <v-row class="mx-3">
+              <v-sheet height="53">
+                <ButtonGroupMini
+                  v-if="listItem.parentId"
+                  :option="selectChildData"
+                  :is-pay="listItem.isPay"
+                  @select="selectChildId"
+                />
+              </v-sheet>
+            </v-row>
+            <v-row justify="center" class="py-3">
+              <v-btn
+                fab
+                elevation="5"
+                :disabled="ObserverProps.invalid"
+                @click="addPaymentList"
+              >
+                <v-icon
+                  :color="listItem.isPay ? 'pay lighten-1' : 'income lighten-1'"
+                >
+                  mdi-arrow-expand-down
+                </v-icon>
+              </v-btn>
+            </v-row>
             <v-row>
               <v-col>
                 <div v-for="(paymentData, i) in paymentDataList" :key="i">
@@ -60,52 +108,6 @@
                 </div>
               </v-col>
             </v-row>
-            <v-row align="center">
-              <v-col cols="9" class="mx-3">
-                <validation-provider
-                  v-slot="{ errors }"
-                  rules="required|numeric"
-                  :name="$t('common.amount')"
-                >
-                  <v-text-field
-                    v-model="listItem.amount"
-                    type="Number"
-                    clearable
-                  />
-                  <p>{{ errors[0] }}</p>
-                </validation-provider>
-              </v-col>
-              <v-col cols="1">{{ $t('common.yen') }}</v-col>
-            </v-row>
-            <v-row class="mx-3">
-              <v-sheet height="53">
-                <ButtonGroupMini
-                  v-if="listItem.parentId"
-                  :data="selectChildData"
-                  :is-pay="listItem.isPay"
-                  @childId="selectChildId"
-                />
-              </v-sheet>
-            </v-row>
-            <v-row class="mx-3">
-              <ButtonGroup
-                :data="parentData"
-                :is-pay="listItem.isPay"
-                @parentId="selectParentId"
-              />
-            </v-row>
-            <v-row class="mr-3">
-              <v-spacer />
-              <v-btn
-                x-small
-                fab
-                elevation="3"
-                :disabled="ObserverProps.invalid"
-                @click="addPaymentList"
-              >
-                <v-icon color="primary"> mdi-plus </v-icon>
-              </v-btn></v-row
-            >
             <v-row>
               <v-col cols="11" class="mx-3">
                 <v-textarea
@@ -134,9 +136,6 @@ import { ChildCategory } from '../types/childCategory'
 
 @Component
 export default class paymentDetail extends Vue {
-  /** 詳細情報を出す日付 */
-  date: string = ''
-
   /** 入力フォーム(収支カード) */
   listItem: PaymentDetail = {
     parentId: '',
@@ -161,11 +160,19 @@ export default class paymentDetail extends Vue {
   /** 選択された日付のデータ */
   paymentDataList: PaymentDetail[] = []
 
+  /** 詳細情報を出す日付 */
+  date: string = moment().format('yyyy-MM-DD')
+
   /** 親カテゴリデータ */
-  parentData: ParentCategory[] = []
+  get parentData(): ParentCategory[] {
+    return categoryStore.getParentCategoryList
+  }
 
   /** 子カテゴリデータ */
-  selectChildData: ChildCategory[] = []
+  get selectChildData(): ChildCategory[] {
+    categoryStore.fetchSelectChildCategoryList(this.listItem.parentId)
+    return categoryStore.getSelectChildCategoryList
+  }
 
   /** イベント取得用 */
   $refs!: any
@@ -174,33 +181,29 @@ export default class paymentDetail extends Vue {
   created() {
     // カテゴリ情報(マスタ)を取得
     categoryStore.fetchParentCategoryList()
-    this.parentData = categoryStore.getParentCategoryList
-    this.listItem.isPay = true
-    if (this.$route.query.target === null) {
-      // 日付が渡されなかったら今日の日付を選択する
-      this.date = moment().format('yyyy-MM-DD')
-      this.isRegist = true
-    } else {
+    this.initializeListItem(true)
+    if (this.$route.query.target !== null) {
       const date = this.$route.query.target.toString()
+      this.selectDatePaymentDetail(date)
       // パラメータの日付をセット
       this.date = date
-      this.selectDatePaymentDetail(date)
     }
   }
 
   /** 選択された日付の収支カードを取得 */
-  selectDatePaymentDetail(date: string) {
+  async selectDatePaymentDetail(date: string) {
     // 日付で検索を掛けて収支詳細を取得
-    paymentDetailStore.fetchPaymentDetailList(date)
-    const paymentDataList = paymentDetailStore.getPaymentDetailList
-    if (paymentDataList == null) {
-      // 値が取れなかった場合
-      this.isRegist = true
-    } else {
-      // フロントで編集するためディープコピーで値を保持
-      this.paymentDataList = JSON.parse(JSON.stringify(paymentDataList))
-      this.isRegist = false
-    }
+    await paymentDetailStore.fetchPaymentDetailList(date).then(() => {
+      const paymentDataList = paymentDetailStore.getPaymentDetailList
+      if (paymentDataList == null) {
+        // 値が取れなかった場合
+        this.isRegist = true
+      } else {
+        // フロントで編集するためディープコピーで値を保持
+        this.paymentDataList = JSON.parse(JSON.stringify(paymentDataList))
+        this.isRegist = false
+      }
+    })
   }
 
   /** 親カテゴリIDから名前を取得 */
@@ -231,14 +234,12 @@ export default class paymentDetail extends Vue {
     return this.$t('common.colon') + name
   }
 
-  /** 親を選択された時、表示する子データを抽出 */
+  /** 親カテゴリを選択されたとき */
   selectParentId(val: string) {
-    categoryStore.fetchSelectChildCategoryList(val)
-    this.selectChildData = categoryStore.getSelectChildCategoryList
     this.listItem.parentId = val
   }
 
-  /** 子データを選択されたとき */
+  /** 子カテゴリを選択されたとき */
   selectChildId(val: string) {
     this.listItem.childId = val
   }
@@ -256,7 +257,7 @@ export default class paymentDetail extends Vue {
       amount: parseInt(this.listItem.amount.toString(), 10),
       isPay: this.listItem.isPay,
     }
-    this.paymentDataList.push(inputData)
+    this.paymentDataList.unshift(inputData)
     this.initializeListItem(this.listItem.isPay)
   }
 

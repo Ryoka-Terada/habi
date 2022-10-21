@@ -6,9 +6,9 @@
         class="overflow-x-auto pa-1"
         rounded
         :background-color="isPay ? 'pay lighten-1' : 'income lighten-1'"
-        @change="childId"
+        @change="select"
       >
-        <div v-for="(category, i) in data" :key="i">
+        <div v-for="(category, i) in option" :key="i">
           <v-btn
             rounded
             small
@@ -30,15 +30,15 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 @Component
 export default class ButtonGroupMini extends Vue {
   @Prop({ type: Array, required: false })
-  data!: { id: string; name: string; parentId: string }[]
+  option!: { id: string; name: string; parentId: string }[]
 
   @Prop({ type: Boolean, required: true })
   isPay!: boolean
 
   selectVal: string = ''
 
-  childId() {
-    this.$emit('childId', this.selectVal)
+  select() {
+    this.$emit('select', this.selectVal)
   }
 }
 </script>

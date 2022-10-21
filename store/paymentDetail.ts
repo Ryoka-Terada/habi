@@ -29,8 +29,8 @@ export default class PaymentDetailModule extends VuexModule {
    * 一日の収支リストを取得
    */
   @Action
-  fetchPaymentDetailList(targetDate: string) {
-    console.log(targetDate + 'の収支リストを取得する')
+  async fetchPaymentDetailList(targetDate: string): Promise<void> {
+    await console.log(targetDate + 'の収支リストを取得する')
     const paymentDetailList: PaymentDetail[] = [
       {
         parentId: '2',
