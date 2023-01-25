@@ -2,9 +2,10 @@
   <div>
     <v-container justify="center" align="center">
       <v-row class="pr-4 mt-1"> <v-spacer /><BurgerMenu /> </v-row>
-      <Calendar :payments="payments" />
+      <Calendar :payments="payments" @setCalendarMonth="setCalendarMonth" />
     </v-container>
     <v-container>
+      {{ month }}
       <v-row
         v-for="(categoryAmount, i) in categoryAmounts"
         :key="i"
@@ -35,12 +36,16 @@
 
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
+import moment from 'moment'
 import { calendarStore } from '../store'
 
 @Component
 export default class Index extends Vue {
   /** 月の収支一覧 */
   payments: { amount: number; isPay: boolean; date: string }[] = []
+
+  /** カレンダータイトル */
+  calendarTitle: string = ''
 
   /** カテゴリ内訳 */
   categoryAmounts: {
@@ -50,12 +55,20 @@ export default class Index extends Vue {
     amount: number
   }[] = []
 
+  get month() {
+    return moment(this.calendarTitle).format('M')
+  }
+
   created() {
     // 月の収支一覧を取得
-    calendarStore.fetchMonthPaymentList('6')
+    calendarStore.fetchMonthPaymentList(this.month)
     this.payments = calendarStore.getMonthPaymentList
     calendarStore.fetchMonthCategorySummary('6')
     this.categoryAmounts = calendarStore.getMonthCategorySummary
+  }
+
+  setCalendarMonth(val: any) {
+    this.calendarTitle = val
   }
 }
 </script>

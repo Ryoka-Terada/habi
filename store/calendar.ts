@@ -6,6 +6,7 @@ import {
   config,
 } from 'vuex-module-decorators'
 import { categoryStore } from '../store'
+import { ParentCategory } from '../types/parentCategory'
 
 config.rawError = true
 
@@ -73,7 +74,7 @@ export default class CalendarModule extends VuexModule {
     console.log(month + '月の収支カテゴリ合計を取得(※便宜的に６月を返す)')
     // 親カテゴリを取得
     categoryStore.fetchParentCategoryList()
-    const categories = categoryStore.getParentCategoryList
+    const categories = categoryStore.getParentCategoryPayList
     // 各親カテゴリにその月の合計額を追加
     const categorySummary: {
       parentId: string
@@ -81,11 +82,11 @@ export default class CalendarModule extends VuexModule {
       isPay: boolean
       amount: number
     }[] = []
-    categories.forEach((category) => {
+    categories.forEach((parent: ParentCategory) => {
       const amount = {
-        parentId: category.id,
-        name: category.name,
-        isPay: category.isPay,
+        parentId: parent.paymentCategoryParentId,
+        name: parent.categoryName,
+        isPay: !!parent.isPay,
         amount: 99999, // ここの合計はバックエンドから取って来る
       }
       categorySummary.push(amount)

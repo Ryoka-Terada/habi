@@ -80,6 +80,7 @@ export default class Calendar extends Vue {
   }
 
   created() {
+    this.$emit('setCalendarMonth', this.title)
     // 月の合計支出額を計算
     let amountPay = 0
     this.payments.forEach((payment) => {
@@ -93,11 +94,13 @@ export default class Calendar extends Vue {
   nextMonth() {
     // ここで親のカテゴリ合計取得メソッドとかを動かす
     this.$refs.calendar.next()
+    this.$emit('setCalendarMonth', this.title)
   }
 
   prevMonth() {
     // ここで親のカテゴリ合計取得メソッドとかを動かす
     this.$refs.calendar.prev()
+    this.$emit('setCalendarMonth', this.title)
   }
 }
 </script>

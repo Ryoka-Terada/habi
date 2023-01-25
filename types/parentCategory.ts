@@ -1,5 +1,9 @@
 export interface ParentCategory {
-  id: string
-  name: string
-  isPay: boolean
+  paymentCategoryParentId: string
+  categoryName: string
+  isPay: string
+  isDelete: string
+  userId: string
+  updatedAt: string
+  createdAt: string
 }

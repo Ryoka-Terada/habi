@@ -165,7 +165,7 @@ export default class paymentDetail extends Vue {
 
   /** 親カテゴリデータ */
   get parentData(): ParentCategory[] {
-    return categoryStore.getParentCategoryList
+    return categoryStore.getParentCategoryPayList
   }
 
   /** 子カテゴリデータ */
@@ -212,9 +212,9 @@ export default class paymentDetail extends Vue {
       return ''
     }
     let name: string = ''
-    this.parentData.forEach((data) => {
-      if (data.id === id) {
-        name = data.name
+    this.parentData.forEach((parent: ParentCategory) => {
+      if (parent.paymentCategoryParentId === id) {
+        name = parent.categoryName
       }
     })
     return name
@@ -226,9 +226,9 @@ export default class paymentDetail extends Vue {
       return ''
     }
     let name: string = ''
-    categoryStore.getChildCategoryList.forEach((data) => {
-      if (data.id === id) {
-        name = data.name
+    categoryStore.getChildCategoryList.forEach((child: ChildCategory) => {
+      if (child.id === id) {
+        name = child.name
       }
     })
     return this.$t('common.colon') + name
