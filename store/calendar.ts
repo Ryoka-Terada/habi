@@ -5,6 +5,7 @@ import {
   Action,
   config,
 } from 'vuex-module-decorators'
+import axios from 'axios'
 import { categoryStore } from '../store'
 import { ParentCategory } from '../types/parentCategory'
 
@@ -55,15 +56,17 @@ export default class CalendarModule extends VuexModule {
    * 月の収支一覧を取得
    */
   @Action
-  fetchMonthPaymentList(month: string) {
-    console.log(month + '月の収支一覧を取得(※便宜的に６月を返す)')
-    const payments: { amount: number; isPay: boolean; date: string }[] = [
-      { amount: 1000, isPay: true, date: '2022-06-10' },
-      { amount: 850, isPay: true, date: '2022-06-12' },
-      { amount: 2050, isPay: false, date: '2022-06-20' },
-      { amount: 340, isPay: true, date: '2022-06-20' },
-    ]
-    this.setMonthPaymentList(payments)
+  fetchMonthPaymentList(_payload: any) {
+    const param: any = {
+      params: {
+        dateFrom: _payload.monthFirstDate,
+        dateTo: _payload.monthEndDate,
+      },
+    }
+    axios.get('api/payment', param).then((value: any) => {
+      console.log(value.data)
+    })
+    // this.setMonthPaymentList(payments)
   }
 
   /**

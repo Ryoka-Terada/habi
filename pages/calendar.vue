@@ -5,7 +5,6 @@
       <Calendar :payments="payments" @setCalendarMonth="setCalendarMonth" />
     </v-container>
     <v-container>
-      {{ month }}
       <v-row
         v-for="(categoryAmount, i) in categoryAmounts"
         :key="i"
@@ -44,8 +43,14 @@ export default class Index extends Vue {
   /** 月の収支一覧 */
   payments: { amount: number; isPay: boolean; date: string }[] = []
 
-  /** カレンダータイトル */
-  calendarTitle: string = ''
+  /** 選択日 */
+  selectDate!: string
+
+  /** 検索条件 */
+  searchParam: { monthFirstDate: string; monthEndDate: string } = {
+    monthFirstDate: '',
+    monthEndDate: '',
+  }
 
   /** カテゴリ内訳 */
   categoryAmounts: {
@@ -55,20 +60,34 @@ export default class Index extends Vue {
     amount: number
   }[] = []
 
-  get month() {
-    return moment(this.calendarTitle).format('M')
+  /**
+   * 月の収支一覧を取得
+   */
+  get paymentList() {
+    calendarStore.fetchMonthPaymentList(this.searchParam)
+    return 'hello'
   }
 
-  created() {
-    // 月の収支一覧を取得
-    calendarStore.fetchMonthPaymentList(this.month)
-    this.payments = calendarStore.getMonthPaymentList
-    calendarStore.fetchMonthCategorySummary('6')
-    this.categoryAmounts = calendarStore.getMonthCategorySummary
-  }
+  created() {}
 
+  /**
+   * カレンダー月が変更された場合、関係値をセット
+   */
   setCalendarMonth(val: any) {
-    this.calendarTitle = val
+    this.setBetweenDate(val)
+    this.selectDate = val
+  }
+
+  /**
+   * 選択された月の開始日と終了日をセット
+   */
+  setBetweenDate(date: string): void {
+    const year = moment(date).year()
+    const month = moment(date).month()
+    const firstDate = new Date(year, month, 1).toLocaleDateString()
+    const endDate = new Date(year, month + 1, 0).toLocaleDateString()
+    this.searchParam.monthFirstDate = moment(firstDate).format('yyyy-MM-DD')
+    this.searchParam.monthEndDate = moment(endDate).format('yyyy-MM-DD')
   }
 }
 </script>
