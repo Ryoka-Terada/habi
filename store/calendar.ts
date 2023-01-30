@@ -8,6 +8,7 @@ import {
 import axios from 'axios'
 import { categoryStore } from '../store'
 import { ParentCategory } from '../types/parentCategory'
+import { Calendar } from '../types/calendar'
 
 config.rawError = true
 
@@ -16,8 +17,7 @@ export default class CalendarModule extends VuexModule {
   /**
    * 月の収支一覧
    */
-  private monthPaymentList: { amount: number; isPay: boolean; date: string }[] =
-    []
+  private monthPaymentList: Calendar[] = []
 
   /**
    * 月の収支カテゴリ合計
@@ -32,11 +32,7 @@ export default class CalendarModule extends VuexModule {
   /**
    * 月の収支一覧を返す
    */
-  get getMonthPaymentList(): {
-    amount: number
-    isPay: boolean
-    date: string
-  }[] {
+  get getMonthPaymentList(): Calendar[] {
     return this.monthPaymentList
   }
 
@@ -63,10 +59,19 @@ export default class CalendarModule extends VuexModule {
         dateTo: _payload.monthEndDate,
       },
     }
-    axios.get('api/payment', param).then((value: any) => {
-      console.log(value.data)
+    axios.get('api/payment', param).then((value) => {
+      const payments = value.data.map((calendar: Calendar) => {
+        return {
+          paymentId: calendar.paymentId,
+          amount: calendar.amount,
+          isPay: calendar.isPay,
+          paymentDate: calendar.paymentDate,
+          paymentCategoryParentId: calendar.paymentCategoryParentId,
+          paymentCategoryChildId: calendar.paymentCategoryChildId ?? '',
+        }
+      })
+      this.setMonthPaymentList(payments)
     })
-    // this.setMonthPaymentList(payments)
   }
 
   /**
@@ -107,9 +112,7 @@ export default class CalendarModule extends VuexModule {
    * 月の収支一覧をセット
    */
   @Mutation
-  setMonthPaymentList(
-    list: { amount: number; isPay: boolean; date: string }[]
-  ) {
+  setMonthPaymentList(list: Calendar[]) {
     this.monthPaymentList = list
   }
 

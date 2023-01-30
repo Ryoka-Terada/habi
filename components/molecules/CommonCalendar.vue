@@ -25,22 +25,22 @@
           <p
             v-if="weekend.includes(weekday)"
             class="red--text text--darken-1"
-            @click="show(date)"
+            @click="clickDay(date)"
           >
             {{ day }}
           </p>
-          <p v-else @click="show(date)">{{ day }}</p>
+          <p v-else @click="clickDay(date)">{{ day }}</p>
         </template>
         <template #day="{ date }">
-          <v-card height="70" flat tile @click="show(date)">
+          <v-card height="70" flat tile @click="clickDay(date)">
             <v-container>
               <div v-for="(payment, i) in payments" :key="i">
-                <v-row v-if="payment.date == date">
+                <v-row v-if="payment.paymentDate == date">
                   <p v-if="payment.isPay" class="pay--text text--darken-1">
-                    {{ $t('common.minus') }}{{ payment.amount }}
+                    {{ $t('common.minus') }}{{ Number(payment.amount) }}
                   </p>
                   <p v-else class="income--text text--darken-1">
-                    {{ $t('common.plus') }}{{ payment.amount }}
+                    {{ $t('common.plus') }}{{ Number(payment.amount) }}
                   </p>
                 </v-row>
               </div>
@@ -55,16 +55,16 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 import moment from 'moment'
+import { Calendar } from '~/types/calendar'
 
 @Component
-export default class Calendar extends Vue {
+export default class CommonCalendar extends Vue {
+  /** 月の収支一覧 */
   @Prop({ type: Array, required: true })
-  payments!: { amount: number; isPay: boolean; date: string }[]
+  payments!: Calendar[]
 
   /** 関数用 */
   $refs: any
-
-  amountPay: number = 0
 
   weekend: number[] = [0, 6]
 
@@ -74,21 +74,24 @@ export default class Calendar extends Vue {
     return moment(this.value).format('yyyy / M')
   }
 
-  show(date: string) {
-    // paymentDetail?target=[yyyy-MM-dd] で遷移
-    this.$router.push({ path: 'paymentDetail', query: { target: date } })
+  /** 合計支出額 */
+  get amountPay() {
+    let amountPay = 0
+    this.payments.forEach((payment) => {
+      payment.isPay
+        ? (amountPay = amountPay + Number(payment.amount))
+        : (amountPay = amountPay + 0)
+    })
+    return amountPay
+  }
+
+  /** 日付を押下時 */
+  clickDay(date: string) {
+    this.$emit('showDateDetail', date)
   }
 
   created() {
     this.$emit('setCalendarMonth', this.value)
-    // 月の合計支出額を計算
-    let amountPay = 0
-    this.payments.forEach((payment) => {
-      payment.isPay
-        ? (amountPay = amountPay + payment.amount)
-        : (amountPay = amountPay + 0)
-    })
-    this.amountPay = amountPay
   }
 
   nextMonth() {

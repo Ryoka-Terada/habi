@@ -2,7 +2,12 @@
   <div>
     <v-container justify="center" align="center">
       <v-row class="pr-4 mt-1"> <v-spacer /><BurgerMenu /> </v-row>
-      <Calendar :payments="payments" @setCalendarMonth="setCalendarMonth" />
+      <CommonCalendar
+        ref="CommonCalendar"
+        :payments="paymentList"
+        @setCalendarMonth="setCalendarMonth"
+        @showDateDetail="showDateDetail"
+      />
     </v-container>
     <v-container>
       <v-row
@@ -37,14 +42,15 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 import moment from 'moment'
 import { calendarStore } from '../store'
+import { Calendar } from '~/types/calendar'
 
 @Component
 export default class Index extends Vue {
-  /** 月の収支一覧 */
-  payments: { amount: number; isPay: boolean; date: string }[] = []
-
   /** 選択日 */
   selectDate!: string
+
+  /** 関数用 */
+  $refs: any
 
   /** 検索条件 */
   searchParam: { monthFirstDate: string; monthEndDate: string } = {
@@ -61,14 +67,11 @@ export default class Index extends Vue {
   }[] = []
 
   /**
-   * 月の収支一覧を取得
+   * 月の収支一覧
    */
-  get paymentList() {
-    calendarStore.fetchMonthPaymentList(this.searchParam)
-    return 'hello'
+  get paymentList(): Calendar[] {
+    return calendarStore.getMonthPaymentList
   }
-
-  created() {}
 
   /**
    * カレンダー月が変更された場合、関係値をセット
@@ -88,6 +91,13 @@ export default class Index extends Vue {
     const endDate = new Date(year, month + 1, 0).toLocaleDateString()
     this.searchParam.monthFirstDate = moment(firstDate).format('yyyy-MM-DD')
     this.searchParam.monthEndDate = moment(endDate).format('yyyy-MM-DD')
+    calendarStore.fetchMonthPaymentList(this.searchParam)
+  }
+
+  /** 日付詳細画面に遷移 */
+  showDateDetail(date: string) {
+    // paymentDetail?target=[yyyy-MM-dd] で遷移
+    this.$router.push({ path: 'paymentDetail', query: { target: date } })
   }
 }
 </script>
