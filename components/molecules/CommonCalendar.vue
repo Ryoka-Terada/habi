@@ -34,13 +34,13 @@
         <template #day="{ date }">
           <v-card height="70" flat tile @click="clickDay(date)">
             <v-container>
-              <div v-for="(payment, i) in payments" :key="i">
-                <v-row v-if="payment.paymentDate == date">
-                  <p v-if="payment.isPay" class="pay--text text--darken-1">
-                    {{ $t('common.minus') }}{{ Number(payment.amount) }}
+              <div v-for="(calendarItem, i) in calendarItemList" :key="i">
+                <v-row v-if="calendarItem.date == date">
+                  <p v-if="calendarItem.isPay" class="pay--text text--darken-1">
+                    {{ $t('common.minus') }}{{ calendarItem.amount }}
                   </p>
                   <p v-else class="income--text text--darken-1">
-                    {{ $t('common.plus') }}{{ Number(payment.amount) }}
+                    {{ $t('common.plus') }}{{ calendarItem.amount }}
                   </p>
                 </v-row>
               </div>
@@ -56,6 +56,11 @@
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 import moment from 'moment'
 import { Calendar } from '~/types/calendar'
+export interface CalendarItemList {
+  date: string
+  amount: number
+  isPay: string
+}
 
 @Component
 export default class CommonCalendar extends Vue {
@@ -83,6 +88,47 @@ export default class CommonCalendar extends Vue {
         : (amountPay = amountPay + 0)
     })
     return amountPay
+  }
+
+  /** 日付と収支フラグが重複していたらまとめる */
+  get calendarItemList(): CalendarItemList[] {
+    const calendarItemList: CalendarItemList[] = []
+    for (let i = 0; i < this.payments.length; i++) {
+      // 日付と収支フラグの組み合わせが既に算出済だったらスキップ
+      const isAddedDate: boolean = calendarItemList.some(
+        (el) =>
+          el.date === this.payments[i].paymentDate &&
+          el.isPay === this.payments[i].isPay
+      )
+      if (isAddedDate) {
+        continue
+      }
+      // 日付と収支フラグが同じレコードが複数あれば加算する
+      const payments = this.payments.filter((el) => {
+        return (
+          el.paymentDate === this.payments[i].paymentDate &&
+          el.isPay === this.payments[i].isPay
+        )
+      })
+      if (payments.length > 1) {
+        let amountPay = 0
+        payments.forEach((payment) => {
+          amountPay += Number(payment.amount)
+        })
+        calendarItemList.push({
+          amount: amountPay,
+          date: payments[0].paymentDate,
+          isPay: payments[0].isPay,
+        })
+      } else {
+        calendarItemList.push({
+          amount: Number(payments[0].amount),
+          date: payments[0].paymentDate,
+          isPay: payments[0].isPay,
+        })
+      }
+    }
+    return calendarItemList
   }
 
   /** 日付を押下時 */
