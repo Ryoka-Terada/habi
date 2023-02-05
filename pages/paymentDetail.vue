@@ -74,7 +74,7 @@
                   v-if="listItem.parentId"
                   :option="selectChildData"
                   :is-pay="listItem.isPay"
-                  mini="true"
+                  :mini="true"
                   @select="selectChildId"
                 />
               </v-sheet>
@@ -95,7 +95,6 @@
             </v-row>
             <v-row>
               <v-col>
-                {{ paymentDataList }}
                 <div v-for="(paymentData, i) in paymentDataList" :key="i">
                   <PaymentList
                     :label="
@@ -140,8 +139,10 @@ import { ButtonGroupOption } from '../components/molecules/ButtonGroup.vue'
 export default class paymentDetail extends Vue {
   /** 入力フォーム(収支カード) */
   listItem: PaymentDetail = {
+    paymentId: '',
     parentId: '',
     childId: '',
+    paymentDate: '',
     amount: 0,
     isPay: true,
   }
@@ -149,8 +150,10 @@ export default class paymentDetail extends Vue {
   /** 入力フォーム初期化 */
   initializeListItem(ispay: boolean) {
     this.listItem = {
+      paymentId: '',
       parentId: '',
       childId: '',
+      paymentDate: '',
       amount: 0,
       isPay: ispay,
     }
@@ -168,15 +171,17 @@ export default class paymentDetail extends Vue {
   /** 親カテゴリデータ */
   get parentData(): ButtonGroupOption[] {
     return this.listItem.isPay
-      ? categoryStore.getParentCategoryPayList.map((parentCategoryPay) => {
-          return {
-            id: parentCategoryPay.parentId,
-            name: parentCategoryPay.categoryName,
-            isPay: parentCategoryPay.isPay,
+      ? categoryStore.getParentCategoryPayList.map(
+          (parentCategoryPay: ParentCategory) => {
+            return {
+              id: parentCategoryPay.parentId,
+              name: parentCategoryPay.categoryName,
+              isPay: parentCategoryPay.isPay,
+            }
           }
-        })
+        )
       : categoryStore.getParentCategoryIncomeList.map(
-          (parentCategoryIncome) => {
+          (parentCategoryIncome: ParentCategory) => {
             return {
               id: parentCategoryIncome.parentId,
               name: parentCategoryIncome.categoryName,
@@ -285,8 +290,10 @@ export default class paymentDetail extends Vue {
   /** 収支カードを追加されたとき */
   addPaymentList() {
     const inputData: PaymentDetail = {
+      paymentId: '',
       parentId: this.listItem.parentId,
       childId: this.listItem.childId,
+      paymentDate: this.date,
       amount: parseInt(this.listItem.amount.toString(), 10),
       isPay: this.listItem.isPay,
     }

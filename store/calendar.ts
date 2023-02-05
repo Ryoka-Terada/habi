@@ -64,7 +64,7 @@ export default class CalendarModule extends VuexModule {
         return {
           paymentId: calendar.paymentId,
           amount: Number(calendar.amount),
-          isPay: calendar.isPay,
+          isPay: !!calendar.isPay,
           paymentDate: calendar.paymentDate,
           parentId: calendar.parentId,
           childId: calendar.childId ?? '',

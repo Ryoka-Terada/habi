@@ -31,7 +31,7 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 export interface ButtonGroupOption {
   id: string
   name: string
-  isPay: string
+  isPay: boolean
 }
 
 @Component
@@ -49,7 +49,7 @@ export default class ButtonGroup extends Vue {
 
   get categorys(): ButtonGroupOption[] {
     return this.option.filter((data) => {
-      return this.isPay ? data.isPay === 1 : data.isPay === 0
+      return this.isPay === data.isPay
     })
   }
 

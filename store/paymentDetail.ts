@@ -43,7 +43,7 @@ export default class PaymentDetailModule extends VuexModule {
           return {
             paymentId: paymentDetail.paymentId,
             amount: Number(paymentDetail.amount),
-            isPay: paymentDetail.isPay,
+            isPay: !!paymentDetail.isPay,
             paymentDate: paymentDetail.paymentDate,
             parentId: paymentDetail.parentId,
             childId: paymentDetail.childId ?? '',

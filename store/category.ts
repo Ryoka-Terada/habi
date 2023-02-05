@@ -81,16 +81,36 @@ export default class CategoryModule extends VuexModule {
   @Action
   fetchParentCategoryList(_payload?: any) {
     axios.get('api/paymentCategoryParent', _payload).then((value: any) => {
-      const payList: ParentCategory[] = value.data.filter(
-        (parentCategory: ParentCategory) => {
-          return parentCategory.isPay
-        }
-      )
-      const incomeList: ParentCategory[] = value.data.filter(
-        (parentCategory: ParentCategory) => {
+      const payList: ParentCategory[] = value.data
+        .filter((parentCategory: ParentCategory) => {
+          return !!parentCategory.isPay
+        })
+        .map((parentCategory: ParentCategory) => {
+          return {
+            parentId: parentCategory.parentId,
+            categoryName: parentCategory.categoryName,
+            isPay: !!parentCategory.isPay,
+            isDelete: parentCategory.isDelete,
+            userId: parentCategory.userId,
+            updatedAt: parentCategory.updatedAt,
+            createdAt: parentCategory.createdAt,
+          }
+        })
+      const incomeList: ParentCategory[] = value.data
+        .filter((parentCategory: ParentCategory) => {
           return !parentCategory.isPay
-        }
-      )
+        })
+        .map((parentCategory: ParentCategory) => {
+          return {
+            parentId: parentCategory.parentId,
+            categoryName: parentCategory.categoryName,
+            isPay: !!parentCategory.isPay,
+            isDelete: parentCategory.isDelete,
+            userId: parentCategory.userId,
+            updatedAt: parentCategory.updatedAt,
+            createdAt: parentCategory.createdAt,
+          }
+        })
       this.setParentCategoryPayList(payList)
       this.setParentCategoryIncomeList(incomeList)
     })
@@ -102,16 +122,36 @@ export default class CategoryModule extends VuexModule {
   @Action
   fetchChildCategoryList(_payload?: any) {
     axios.get('api/paymentCategoryChild', _payload).then((value: any) => {
-      const payList: ChildCategory[] = value.data.filter(
-        (childCategory: ChildCategory) => {
-          return childCategory.isPay
-        }
-      )
-      const incomeList: ChildCategory[] = value.data.filter(
-        (childCategory: ChildCategory) => {
+      const payList: ChildCategory[] = value.data
+        .filter((childCategory: ChildCategory) => {
+          return !!childCategory.isPay
+        })
+        .map((childCategory: ChildCategory) => {
+          return {
+            childId: childCategory.childId,
+            categoryName: childCategory.categoryName,
+            parentId: childCategory.parentId,
+            isDelete: childCategory.isDelete,
+            createdAt: childCategory.createdAt,
+            updatedAt: childCategory.updatedAt,
+            isPay: !!childCategory.isPay,
+          }
+        })
+      const incomeList: ChildCategory[] = value.data
+        .filter((childCategory: ChildCategory) => {
           return !childCategory.isPay
-        }
-      )
+        })
+        .map((childCategory: ChildCategory) => {
+          return {
+            childId: childCategory.childId,
+            categoryName: childCategory.categoryName,
+            parentId: childCategory.parentId,
+            isDelete: childCategory.isDelete,
+            createdAt: childCategory.createdAt,
+            updatedAt: childCategory.updatedAt,
+            isPay: !!childCategory.isPay,
+          }
+        })
       this.setChildCategoryPayList(payList)
       this.setChildCategoryIncomeList(incomeList)
     })

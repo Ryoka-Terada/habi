@@ -61,7 +61,7 @@ import { Calendar } from '~/types/calendar'
 export interface CalendarItemList {
   date: string
   amount: number
-  isPay: string
+  isPay: boolean
 }
 
 @Component

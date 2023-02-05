@@ -5,5 +5,5 @@ export interface ChildCategory {
   isDelete: string
   createdAt: string
   updatedAt: string
-  isPay: string
+  isPay: boolean
 }

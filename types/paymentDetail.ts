@@ -4,7 +4,7 @@ export interface PaymentDetail {
   /** 合計金額 */
   amount: number
   /** 収支フラグ */
-  isPay: string
+  isPay: boolean
   /** 日付 */
   paymentDate: string
   /** 親カテゴリID */
