@@ -70,10 +70,11 @@
             </v-row>
             <v-row class="mx-3">
               <v-sheet height="53">
-                <ButtonGroupMini
+                <ButtonGroup
                   v-if="listItem.parentId"
                   :option="selectChildData"
                   :is-pay="listItem.isPay"
+                  mini="true"
                   @select="selectChildId"
                 />
               </v-sheet>
@@ -94,11 +95,11 @@
             </v-row>
             <v-row>
               <v-col>
+                {{ paymentDataList }}
                 <div v-for="(paymentData, i) in paymentDataList" :key="i">
                   <PaymentList
                     :label="
-                      getParentName(paymentData.parentId) +
-                      getChildName(paymentData.childId)
+                      getParentName(paymentData) + getChildName(paymentData)
                     "
                     :amount="paymentData.amount"
                     :is-pay="paymentData.isPay"
@@ -133,6 +134,7 @@ import { categoryStore, paymentDetailStore } from '../store'
 import { PaymentDetail } from '../types/paymentDetail'
 import { ParentCategory } from '../types/parentCategory'
 import { ChildCategory } from '../types/childCategory'
+import { ButtonGroupOption } from '../components/molecules/ButtonGroup.vue'
 
 @Component
 export default class paymentDetail extends Vue {
@@ -164,14 +166,42 @@ export default class paymentDetail extends Vue {
   date: string = moment().format('yyyy-MM-DD')
 
   /** 親カテゴリデータ */
-  get parentData(): ParentCategory[] {
-    return categoryStore.getParentCategoryPayList
+  get parentData(): ButtonGroupOption[] {
+    return this.listItem.isPay
+      ? categoryStore.getParentCategoryPayList.map((parentCategoryPay) => {
+          return {
+            id: parentCategoryPay.parentId,
+            name: parentCategoryPay.categoryName,
+            isPay: parentCategoryPay.isPay,
+          }
+        })
+      : categoryStore.getParentCategoryIncomeList.map(
+          (parentCategoryIncome) => {
+            return {
+              id: parentCategoryIncome.parentId,
+              name: parentCategoryIncome.categoryName,
+              isPay: parentCategoryIncome.isPay,
+            }
+          }
+        )
   }
 
   /** 子カテゴリデータ */
-  get selectChildData(): ChildCategory[] {
-    categoryStore.fetchSelectChildCategoryList(this.listItem.parentId)
-    return categoryStore.getSelectChildCategoryList
+  get selectChildData(): ButtonGroupOption[] {
+    const childCategoryList = this.listItem.isPay
+      ? categoryStore.getChildCategoryPayList
+      : categoryStore.getChildCategoryIncomeList
+    return childCategoryList
+      .filter((childCategory: ChildCategory) => {
+        return childCategory.parentId === this.listItem.parentId
+      })
+      .map((filteredChildCategory) => {
+        return {
+          id: filteredChildCategory.childId,
+          name: filteredChildCategory.categoryName,
+          isPay: filteredChildCategory.isPay,
+        }
+      })
   }
 
   /** イベント取得用 */
@@ -207,28 +237,31 @@ export default class paymentDetail extends Vue {
   }
 
   /** 親カテゴリIDから名前を取得 */
-  getParentName(id: string): string {
-    if (id === '') {
+  getParentName(paymentData: PaymentDetail): string {
+    if (paymentData.parentId === '') {
       return ''
     }
     let name: string = ''
-    this.parentData.forEach((parent: ParentCategory) => {
-      if (parent.paymentCategoryParentId === id) {
-        name = parent.categoryName
+    this.parentData.forEach((parent: ButtonGroupOption) => {
+      if (parent.id === paymentData.parentId) {
+        name = parent.name
       }
     })
     return name
   }
 
   /** 子カテゴリIDから名前を取得 */
-  getChildName(id: string): string {
-    if (id === '') {
+  getChildName(paymentData: PaymentDetail): string {
+    if (paymentData.childId === '') {
       return ''
     }
     let name: string = ''
-    categoryStore.getChildCategoryList.forEach((child: ChildCategory) => {
-      if (child.id === id) {
-        name = child.name
+    const chiltCategoryList = paymentData.isPay
+      ? categoryStore.getChildCategoryPayList
+      : categoryStore.getChildCategoryIncomeList
+    chiltCategoryList.forEach((child: ChildCategory) => {
+      if (child.childId === paymentData.childId) {
+        name = child.categoryName
       }
     })
     return this.$t('common.colon') + name

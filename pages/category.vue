@@ -4,8 +4,8 @@
       <v-row class="pr-4 mt-1"> <v-spacer /><BurgerMenu /> </v-row>
     </v-container>
     <v-tabs v-model="tab">
-      <v-tab v-for="(category, i) in categories" :key="i">
-        {{ category }}
+      <v-tab v-for="(menu, i) in tabMenu" :key="i">
+        {{ menu }}
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab">
@@ -14,7 +14,7 @@
         <div v-for="(categoryPay, i) in parentCategoryPayList" :key="i">
           <CategoryTable
             :parent="categoryPay"
-            :childs="childCategoryInParent(categoryPay.paymentCategoryParentId)"
+            :childs="childCategoryInParent(categoryPay.parentId, 1)"
             :is-pay="true"
           />
         </div>
@@ -24,9 +24,7 @@
         <div v-for="(categoryIncome, i) in parentCategoryIncomeList" :key="i">
           <CategoryTable
             :parent="categoryIncome"
-            :childs="
-              childCategoryInParent(categoryIncome.paymentCategoryParentId)
-            "
+            :childs="childCategoryInParent(categoryIncome.parentId, 0)"
             :is-pay="false"
           />
         </div>
@@ -43,25 +41,32 @@ import { ChildCategory } from '../types/childCategory'
 
 @Component
 export default class Category extends Vue {
-  tabPay = true
-  tabIncome = false
-  tab: any = this.tabPay
-  categories = [this.$t('common.pay'), this.$t('common.income')]
+  /** タブの選択状態 */
+  tab: any = true
+  /** タブメニューリスト */
+  tabMenu = [this.$t('common.pay'), this.$t('common.income')]
 
+  /** 親カテゴリ一覧(支出) */
   get parentCategoryPayList(): ParentCategory[] {
     return categoryStore.getParentCategoryPayList
   }
 
+  /** 親カテゴリ一覧(収入) */
   get parentCategoryIncomeList(): ParentCategory[] {
     return categoryStore.getParentCategoryIncomeList
   }
 
-  childCategoryInParent(parentCategoryId: string): ChildCategory[] {
-    return categoryStore.getChildCategoryList.filter(
-      (childCategory: ChildCategory) => {
-        return childCategory.paymentCategoryParentId === parentCategoryId
-      }
-    )
+  /** 親カテゴリの中の子カテゴリを取得 */
+  childCategoryInParent(
+    parentCategoryId: string,
+    isPay: boolean
+  ): ChildCategory[] {
+    const childCategoryList = isPay
+      ? categoryStore.getChildCategoryPayList
+      : categoryStore.getChildCategoryIncomeList
+    return childCategoryList.filter((childCategory: ChildCategory) => {
+      return childCategory.parentId === parentCategoryId
+    })
   }
 
   /**

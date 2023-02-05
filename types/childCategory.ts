@@ -1,7 +1,7 @@
 export interface ChildCategory {
-  paymentCategoryChildId: string
+  childId: string
   categoryName: string
-  paymentCategoryParentId: string
+  parentId: string
   isDelete: string
   createdAt: string
   updatedAt: string

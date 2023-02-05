@@ -49,6 +49,10 @@ export default class Index extends Vue {
   /** 選択日 */
   selectDate!: string
 
+  get tmp() {
+    return this.$emit('ParentCategoryPayList')
+  }
+
   /** 関数用 */
   $refs: any
 

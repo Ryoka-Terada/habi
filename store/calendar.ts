@@ -63,11 +63,11 @@ export default class CalendarModule extends VuexModule {
       const payments = value.data.map((calendar: Calendar) => {
         return {
           paymentId: calendar.paymentId,
-          amount: calendar.amount,
+          amount: Number(calendar.amount),
           isPay: calendar.isPay,
           paymentDate: calendar.paymentDate,
-          paymentCategoryParentId: calendar.paymentCategoryParentId,
-          paymentCategoryChildId: calendar.paymentCategoryChildId ?? '',
+          parentId: calendar.parentId,
+          childId: calendar.childId ?? '',
         }
       })
       this.setMonthPaymentList(payments)
@@ -92,7 +92,7 @@ export default class CalendarModule extends VuexModule {
     }[] = []
     categories.forEach((parent: ParentCategory) => {
       const amount = {
-        parentId: parent.paymentCategoryParentId,
+        parentId: parent.parentId,
         name: parent.categoryName,
         isPay: !!parent.isPay,
         amount: 99999, // ここの合計はバックエンドから取って来る

@@ -5,6 +5,7 @@ import {
   Action,
   config,
 } from 'vuex-module-decorators'
+import axios from 'axios'
 import { PaymentDetail } from '../types/paymentDetail'
 
 config.rawError = true
@@ -29,30 +30,28 @@ export default class PaymentDetailModule extends VuexModule {
    * 一日の収支リストを取得
    */
   @Action
-  async fetchPaymentDetailList(targetDate: string): Promise<void> {
-    await console.log(targetDate + 'の収支リストを取得する')
-    const paymentDetailList: PaymentDetail[] = [
-      {
-        parentId: '2',
-        childId: '2a',
-        amount: 2200,
-        isPay: true,
+  fetchPaymentDetailList(targetDate: string): Promise<void> {
+    const param: any = {
+      params: {
+        dateFrom: targetDate,
+        dateTo: targetDate,
       },
-      {
-        parentId: '1',
-        childId: '1b',
-        amount: 500,
-        isPay: true,
-      },
-      {
-        parentId: '3',
-        childId: '3a',
-        amount: 800,
-        isPay: false,
-      },
-      { parentId: '', childId: '', amount: 100, isPay: true },
-    ]
-    this.setPaymentDetailList(paymentDetailList)
+    }
+    axios.get('api/payment', param).then((value) => {
+      const paymentDetailList = value.data.map(
+        (paymentDetail: PaymentDetail) => {
+          return {
+            paymentId: paymentDetail.paymentId,
+            amount: Number(paymentDetail.amount),
+            isPay: paymentDetail.isPay,
+            paymentDate: paymentDetail.paymentDate,
+            parentId: paymentDetail.parentId,
+            childId: paymentDetail.childId ?? '',
+          }
+        }
+      )
+      this.setPaymentDetailList(paymentDetailList)
+    })
   }
 
   /**

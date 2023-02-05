@@ -1,5 +1,5 @@
 export interface ParentCategory {
-  paymentCategoryParentId: string
+  parentId: string
   categoryName: string
   isPay: string
   isDelete: string

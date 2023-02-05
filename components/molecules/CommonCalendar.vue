@@ -2,22 +2,24 @@
   <div>
     <v-row align="center" justify="center">
       <v-col cols="auto">
-        <v-btn color="primary" @click="prevMonth"
+        <v-btn color="primary" @click="monthTransition(0)"
           ><v-icon>mdi-arrow-left-bold-outline</v-icon></v-btn
         >
       </v-col>
       <v-col cols="auto">{{ title }}</v-col>
       <v-col cols="auto">
-        <v-btn color="primary" @click="nextMonth"
+        <v-btn color="primary" @click="monthTransition(1)"
           ><v-icon>mdi-arrow-right-bold-outline</v-icon></v-btn
         >
       </v-col>
     </v-row>
-    <v-card-title>{{ amountPay }}{{ $t('common.yen') }}</v-card-title>
+    <v-card-title class="red--text text--darken-1">
+      {{ $t('common.minus') }}{{ amountPay }}{{ $t('common.yen') }}
+    </v-card-title>
     <v-sheet height="600">
       <v-calendar
         ref="calendar"
-        v-model="value"
+        v-model="today"
         locale="ja"
         :event-height="1000"
       >
@@ -71,12 +73,15 @@ export default class CommonCalendar extends Vue {
   /** 関数用 */
   $refs: any
 
+  /** 土曜日曜算出用変数 */
   weekend: number[] = [0, 6]
 
-  value = moment().format('yyyy-MM-DD')
+  /** 今日の日付 */
+  today = moment().format('yyyy-MM-DD')
 
+  /** 表示中の年月 */
   get title() {
-    return moment(this.value).format('yyyy / M')
+    return moment(this.today).format('yyyy / M')
   }
 
   /** 合計支出額 */
@@ -84,7 +89,7 @@ export default class CommonCalendar extends Vue {
     let amountPay = 0
     this.payments.forEach((payment) => {
       payment.isPay
-        ? (amountPay = amountPay + Number(payment.amount))
+        ? (amountPay = amountPay + payment.amount)
         : (amountPay = amountPay + 0)
     })
     return amountPay
@@ -113,7 +118,7 @@ export default class CommonCalendar extends Vue {
       if (payments.length > 1) {
         let amountPay = 0
         payments.forEach((payment) => {
-          amountPay += Number(payment.amount)
+          amountPay += payment.amount
         })
         calendarItemList.push({
           amount: amountPay,
@@ -122,7 +127,7 @@ export default class CommonCalendar extends Vue {
         })
       } else {
         calendarItemList.push({
-          amount: Number(payments[0].amount),
+          amount: payments[0].amount,
           date: payments[0].paymentDate,
           isPay: payments[0].isPay,
         })
@@ -131,25 +136,20 @@ export default class CommonCalendar extends Vue {
     return calendarItemList
   }
 
+  created() {
+    this.$emit('setCalendarMonth', this.today)
+  }
+
+  /** カレンダー月変更時 */
+  monthTransition(isNext: boolean) {
+    // ここで親のカテゴリ合計取得メソッドとかを動かす
+    isNext ? this.$refs.calendar.next() : this.$refs.calendar.prev()
+    this.$emit('setCalendarMonth', this.today)
+  }
+
   /** 日付を押下時 */
   clickDay(date: string) {
     this.$emit('showDateDetail', date)
-  }
-
-  created() {
-    this.$emit('setCalendarMonth', this.value)
-  }
-
-  nextMonth() {
-    // ここで親のカテゴリ合計取得メソッドとかを動かす
-    this.$refs.calendar.next()
-    this.$emit('setCalendarMonth', this.value)
-  }
-
-  prevMonth() {
-    // ここで親のカテゴリ合計取得メソッドとかを動かす
-    this.$refs.calendar.prev()
-    this.$emit('setCalendarMonth', this.value)
   }
 }
 </script>

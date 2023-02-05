@@ -26,10 +26,16 @@ export default class CategoryModule extends VuexModule {
   private parentCategoryIncomeList: ParentCategory[] = []
 
   /**
-   * 子カテゴリ一覧
+   * 子カテゴリ一覧(支出)
    * @type {ChildCategory[]}
    */
-  private childCategoryList: ChildCategory[] = []
+  private childCategoryPayList: ChildCategory[] = []
+
+  /**
+   * 子カテゴリ一覧(収入)
+   * @type {ChildCategory[]}
+   */
+  private childCategoryIncomeList: ChildCategory[] = []
 
   /**
    * 子カテゴリ一覧(親カテゴリ指定)
@@ -54,20 +60,20 @@ export default class CategoryModule extends VuexModule {
   }
 
   /**
-   * 子カテゴリ一覧を返す
+   * 子カテゴリ一覧(支出)を返す
    * @return {ChildCategory[]}
    */
-  get getChildCategoryList(): ChildCategory[] {
-    return this.childCategoryList
+  get getChildCategoryPayList(): ChildCategory[] {
+    return this.childCategoryPayList
   }
 
-  // /**
-  //  * 子カテゴリ一覧を返す
-  //  * @return {ChildCategory[]}
-  //  */
-  // get getSelectChildCategoryList(): ChildCategory[] {
-  //   return this.selectChildCategoryList
-  // }
+  /**
+   * 子カテゴリ一覧(収入)を返す
+   * @return {ChildCategory[]}
+   */
+  get getChildCategoryIncomeList(): ChildCategory[] {
+    return this.childCategoryIncomeList
+  }
 
   /**
    * 親カテゴリ一覧を取得
@@ -96,12 +102,24 @@ export default class CategoryModule extends VuexModule {
   @Action
   fetchChildCategoryList(_payload?: any) {
     axios.get('api/paymentCategoryChild', _payload).then((value: any) => {
-      this.setChildCategoryList(value.data)
+      const payList: ChildCategory[] = value.data.filter(
+        (childCategory: ChildCategory) => {
+          return childCategory.isPay
+        }
+      )
+      const incomeList: ChildCategory[] = value.data.filter(
+        (childCategory: ChildCategory) => {
+          return !childCategory.isPay
+        }
+      )
+      this.setChildCategoryPayList(payList)
+      this.setChildCategoryIncomeList(incomeList)
     })
   }
 
   /**
    * 子カテゴリ一覧(親カテゴリ指定)を取得
+   * これはfetchじゃなくてgetterであるべき
    */
   // @Action
   // fetchSelectChildCategoryList(parentId: string) {
@@ -128,11 +146,19 @@ export default class CategoryModule extends VuexModule {
   }
 
   /**
-   * 子カテゴリ一覧をセット
+   * 子カテゴリ一覧(支出)をセット
    */
   @Mutation
-  setChildCategoryList(list: ChildCategory[]) {
-    this.childCategoryList = list
+  setChildCategoryPayList(list: ChildCategory[]) {
+    this.childCategoryPayList = list
+  }
+
+  /**
+   * 子カテゴリ一覧(収入)をセット
+   */
+  @Mutation
+  setChildCategoryIncomeList(list: ChildCategory[]) {
+    this.childCategoryIncomeList = list
   }
 
   // /**
