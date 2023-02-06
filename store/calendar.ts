@@ -52,14 +52,14 @@ export default class CalendarModule extends VuexModule {
    * 月の収支一覧を取得
    */
   @Action
-  fetchMonthPaymentList(_payload: any) {
+  async fetchMonthPaymentList(_payload: any): Promise<void> {
     const param: any = {
       params: {
         dateFrom: _payload.monthFirstDate,
         dateTo: _payload.monthEndDate,
       },
     }
-    axios.get('api/payment', param).then((value) => {
+    await axios.get('api/payment', param).then((value) => {
       const payments = value.data.map((calendar: Calendar) => {
         return {
           paymentId: calendar.paymentId,

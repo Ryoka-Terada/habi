@@ -79,49 +79,51 @@ export default class CategoryModule extends VuexModule {
    * 親カテゴリ一覧を取得
    */
   @Action
-  fetchParentCategoryList(_payload?: any) {
-    axios.get('api/paymentCategoryParent', _payload).then((value: any) => {
-      const payList: ParentCategory[] = value.data
-        .filter((parentCategory: ParentCategory) => {
-          return !!parentCategory.isPay
-        })
-        .map((parentCategory: ParentCategory) => {
-          return {
-            parentId: parentCategory.parentId,
-            categoryName: parentCategory.categoryName,
-            isPay: !!parentCategory.isPay,
-            isDelete: parentCategory.isDelete,
-            userId: parentCategory.userId,
-            updatedAt: parentCategory.updatedAt,
-            createdAt: parentCategory.createdAt,
-          }
-        })
-      const incomeList: ParentCategory[] = value.data
-        .filter((parentCategory: ParentCategory) => {
-          return !parentCategory.isPay
-        })
-        .map((parentCategory: ParentCategory) => {
-          return {
-            parentId: parentCategory.parentId,
-            categoryName: parentCategory.categoryName,
-            isPay: !!parentCategory.isPay,
-            isDelete: parentCategory.isDelete,
-            userId: parentCategory.userId,
-            updatedAt: parentCategory.updatedAt,
-            createdAt: parentCategory.createdAt,
-          }
-        })
-      this.setParentCategoryPayList(payList)
-      this.setParentCategoryIncomeList(incomeList)
-    })
+  async fetchParentCategoryList(_payload?: any): Promise<void> {
+    await axios
+      .get('api/paymentCategoryParent', _payload)
+      .then((value: any) => {
+        const payList: ParentCategory[] = value.data
+          .filter((parentCategory: ParentCategory) => {
+            return !!parentCategory.isPay
+          })
+          .map((parentCategory: ParentCategory) => {
+            return {
+              parentId: parentCategory.parentId,
+              categoryName: parentCategory.categoryName,
+              isPay: !!parentCategory.isPay,
+              isDelete: parentCategory.isDelete,
+              userId: parentCategory.userId,
+              updatedAt: parentCategory.updatedAt,
+              createdAt: parentCategory.createdAt,
+            }
+          })
+        const incomeList: ParentCategory[] = value.data
+          .filter((parentCategory: ParentCategory) => {
+            return !parentCategory.isPay
+          })
+          .map((parentCategory: ParentCategory) => {
+            return {
+              parentId: parentCategory.parentId,
+              categoryName: parentCategory.categoryName,
+              isPay: !!parentCategory.isPay,
+              isDelete: parentCategory.isDelete,
+              userId: parentCategory.userId,
+              updatedAt: parentCategory.updatedAt,
+              createdAt: parentCategory.createdAt,
+            }
+          })
+        this.setParentCategoryPayList(payList)
+        this.setParentCategoryIncomeList(incomeList)
+      })
   }
 
   /**
    * 子カテゴリ一覧を取得
    */
   @Action
-  fetchChildCategoryList(_payload?: any) {
-    axios.get('api/paymentCategoryChild', _payload).then((value: any) => {
+  async fetchChildCategoryList(_payload?: any): Promise<void> {
+    await axios.get('api/paymentCategoryChild', _payload).then((value: any) => {
       const payList: ChildCategory[] = value.data
         .filter((childCategory: ChildCategory) => {
           return !!childCategory.isPay

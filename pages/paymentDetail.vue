@@ -63,7 +63,7 @@
             </v-row>
             <v-row class="mx-3 mt-0">
               <ButtonGroup
-                :option="parentData"
+                :option="parentOptions"
                 :is-pay="listItem.isPay"
                 @select="selectParentId"
               />
@@ -72,7 +72,7 @@
               <v-sheet height="53">
                 <ButtonGroup
                   v-if="listItem.parentId"
-                  :option="selectChildData"
+                  :option="childOptions"
                   :is-pay="listItem.isPay"
                   :mini="true"
                   @select="selectChildId"
@@ -168,43 +168,42 @@ export default class paymentDetail extends Vue {
   /** 詳細情報を出す日付 */
   date: string = moment().format('yyyy-MM-DD')
 
-  /** 親カテゴリデータ */
-  get parentData(): ButtonGroupOption[] {
-    return this.listItem.isPay
-      ? categoryStore.getParentCategoryPayList.map(
-          (parentCategoryPay: ParentCategory) => {
-            return {
-              id: parentCategoryPay.parentId,
-              name: parentCategoryPay.categoryName,
-              isPay: parentCategoryPay.isPay,
-            }
-          }
-        )
-      : categoryStore.getParentCategoryIncomeList.map(
-          (parentCategoryIncome: ParentCategory) => {
-            return {
-              id: parentCategoryIncome.parentId,
-              name: parentCategoryIncome.categoryName,
-              isPay: parentCategoryIncome.isPay,
-            }
-          }
-        )
+  /** 親カテゴリ(支出) */
+  parentPay: ParentCategory[] = []
+
+  /** 親カテゴリ(収入) */
+  parentIncome: ParentCategory[] = []
+
+  /** 子カテゴリ(支出) */
+  childPay: ChildCategory[] = []
+
+  /** 子カテゴリ(収入) */
+  childIncome: ChildCategory[] = []
+
+  /** 親カテゴリ選択ボタン */
+  get parentOptions(): ButtonGroupOption[] {
+    const parentList = this.listItem.isPay ? this.parentPay : this.parentIncome
+    return parentList.map((parentList) => {
+      return {
+        id: parentList.parentId,
+        name: parentList.categoryName,
+        isPay: parentList.isPay,
+      }
+    })
   }
 
-  /** 子カテゴリデータ */
-  get selectChildData(): ButtonGroupOption[] {
-    const childCategoryList = this.listItem.isPay
-      ? categoryStore.getChildCategoryPayList
-      : categoryStore.getChildCategoryIncomeList
-    return childCategoryList
-      .filter((childCategory: ChildCategory) => {
-        return childCategory.parentId === this.listItem.parentId
+  /** 子カテゴリ選択ボタン */
+  get childOptions(): ButtonGroupOption[] {
+    const childList = this.listItem.isPay ? this.childPay : this.childIncome
+    return childList
+      .filter((childList: ChildCategory) => {
+        return childList.parentId === this.listItem.parentId
       })
-      .map((filteredChildCategory) => {
+      .map((childList) => {
         return {
-          id: filteredChildCategory.childId,
-          name: filteredChildCategory.categoryName,
-          isPay: filteredChildCategory.isPay,
+          id: childList.childId,
+          name: childList.categoryName,
+          isPay: childList.isPay,
         }
       })
   }
@@ -214,15 +213,30 @@ export default class paymentDetail extends Vue {
 
   /** 画面表示時 */
   created() {
-    // カテゴリ情報(マスタ)を取得
-    categoryStore.fetchParentCategoryList()
-    this.initializeListItem(true)
+    const promise: any = []
+    // 親カテゴリ情報を取得
+    promise.push(
+      categoryStore.fetchParentCategoryList().then(() => {
+        this.parentPay = categoryStore.getParentCategoryPayList
+        this.parentIncome = categoryStore.getParentCategoryIncomeList
+      })
+    )
+    // 子カテゴリ情報を取得
+    promise.push(
+      categoryStore.fetchChildCategoryList().then(() => {
+        this.childPay = categoryStore.getChildCategoryPayList
+        this.childIncome = categoryStore.getChildCategoryIncomeList
+      })
+    )
+    // 日付を選択された場合、その日付に登録してある収支を取得
     if (this.$route.query.target !== null) {
       const date = this.$route.query.target.toString()
-      this.selectDatePaymentDetail(date)
-      // パラメータの日付をセット
+      promise.push(this.selectDatePaymentDetail(date))
       this.date = date
     }
+    Promise.all(promise).then(() => {
+      this.initializeListItem(true)
+    })
   }
 
   /** 選択された日付の収支カードを取得 */
@@ -246,10 +260,13 @@ export default class paymentDetail extends Vue {
     if (paymentData.parentId === '') {
       return ''
     }
-    let name: string = ''
-    this.parentData.forEach((parent: ButtonGroupOption) => {
-      if (parent.id === paymentData.parentId) {
-        name = parent.name
+    const parentData: ParentCategory[] = paymentData.isPay
+      ? this.parentPay
+      : this.parentIncome
+    let name = ''
+    parentData.forEach((parent: ParentCategory) => {
+      if (parent.parentId === paymentData.parentId) {
+        name = parent.categoryName
       }
     })
     return name

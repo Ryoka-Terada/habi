@@ -30,14 +30,14 @@ export default class PaymentDetailModule extends VuexModule {
    * 一日の収支リストを取得
    */
   @Action
-  fetchPaymentDetailList(targetDate: string): Promise<void> {
+  async fetchPaymentDetailList(targetDate: string): Promise<void> {
     const param: any = {
       params: {
         dateFrom: targetDate,
         dateTo: targetDate,
       },
     }
-    axios.get('api/payment', param).then((value) => {
+    await axios.get('api/payment', param).then((value) => {
       const paymentDetailList = value.data.map(
         (paymentDetail: PaymentDetail) => {
           return {
