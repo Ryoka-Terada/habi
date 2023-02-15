@@ -29,7 +29,7 @@
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 @Component
-export default class paymentDetail extends Vue {
+export default class DatePicker extends Vue {
   @Prop({ type: String, required: true })
   date!: string
 

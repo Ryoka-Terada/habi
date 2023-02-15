@@ -6,24 +6,16 @@
           <v-tabs fixed-tabs>
             <v-col
               class="secondary lighten-2 d-flex justify-center align-center"
-              @click="updateData"
+              @click="$router.push('/calendar')"
             >
               {{ $t('common.cancel') }}
             </v-col>
             <v-col
-              v-if="isRegist"
-              class="primary white--text d-flex justify-center align-center"
-              @click="registData"
-            >
-              {{ $t('common.regist') }}
-            </v-col>
-            <v-col
-              v-else
               class="primary white--text d-flex justify-center align-center"
               @click="updateData"
             >
               <div>
-                {{ $t('common.update') }}
+                {{ submitLabel }}
               </div>
             </v-col>
           </v-tabs>
@@ -138,31 +130,24 @@ import { ButtonGroupOption } from '../components/molecules/ButtonGroup.vue'
 @Component
 export default class paymentDetail extends Vue {
   /** 入力フォーム(収支カード) */
-  listItem: PaymentDetail = {
-    paymentId: '',
-    parentId: '',
-    childId: '',
-    paymentDate: '',
-    amount: 0,
-    isPay: true,
-  }
+  listItem: PaymentDetail = this.initializeListItem(true)
 
   /** 入力フォーム初期化 */
   initializeListItem(ispay: boolean) {
-    this.listItem = {
+    return (this.listItem = {
       paymentId: '',
       parentId: '',
       childId: '',
       paymentDate: '',
       amount: 0,
       isPay: ispay,
-    }
+    })
   }
 
   /** 登録更新ステータス */
-  isRegist: boolean = true
+  submitLabel: string = '...'
 
-  /** 選択された日付のデータ */
+  /** 選択された日付の収支詳細データ */
   paymentDataList: PaymentDetail[] = []
 
   /** 詳細情報を出す日付 */
@@ -212,7 +197,7 @@ export default class paymentDetail extends Vue {
   $refs!: any
 
   /** 画面表示時 */
-  created() {
+  created(): void {
     const promise: any = []
     // 親カテゴリ情報を取得
     promise.push(
@@ -244,13 +229,13 @@ export default class paymentDetail extends Vue {
     // 日付で検索を掛けて収支詳細を取得
     await paymentDetailStore.fetchPaymentDetailList(date).then(() => {
       const paymentDataList = paymentDetailStore.getPaymentDetailList
-      if (paymentDataList == null) {
+      if (paymentDataList.length === 0) {
         // 値が取れなかった場合
-        this.isRegist = true
+        this.submitLabel = this.$tc('common.regist')
       } else {
         // フロントで編集するためディープコピーで値を保持
         this.paymentDataList = JSON.parse(JSON.stringify(paymentDataList))
-        this.isRegist = false
+        this.submitLabel = this.$tc('common.update')
       }
     })
   }
@@ -290,41 +275,35 @@ export default class paymentDetail extends Vue {
   }
 
   /** 親カテゴリを選択されたとき */
-  selectParentId(val: string) {
+  selectParentId(val: string): void {
     this.listItem.parentId = val
   }
 
   /** 子カテゴリを選択されたとき */
-  selectChildId(val: string) {
+  selectChildId(val: string): void {
     this.listItem.childId = val
   }
 
   /** 収支カードの×を押されたとき */
-  close(listNo: number) {
+  close(listNo: number): void {
     this.paymentDataList.splice(listNo, 1)
   }
 
   /** 収支カードを追加されたとき */
-  addPaymentList() {
+  addPaymentList(): void {
     const inputData: PaymentDetail = {
-      paymentId: '',
+      paymentId: '0',
       parentId: this.listItem.parentId,
       childId: this.listItem.childId,
       paymentDate: this.date,
-      amount: parseInt(this.listItem.amount.toString(), 10),
+      amount: Number(this.listItem.amount),
       isPay: this.listItem.isPay,
     }
     this.paymentDataList.unshift(inputData)
     this.initializeListItem(this.listItem.isPay)
   }
 
-  /** 登録ボタンを押されたとき */
-  registData() {
-    paymentDetailStore.registPaymentDetailList(this.paymentDataList)
-    this.$router.push('/calendar')
-  }
-
-  /** 更新ボタンを押されたとき */
+  /** 登録・更新ボタンを押されたとき */
   updateData() {
     paymentDetailStore.updatePaymentDetailList(this.paymentDataList)
     this.$router.push('/calendar')

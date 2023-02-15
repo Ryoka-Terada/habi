@@ -58,16 +58,19 @@ export default class PaymentDetailModule extends VuexModule {
    * 一日の収支リストを登録
    */
   @Action
-  registPaymentDetailList(list: PaymentDetail[]) {
-    console.log(list + 'を新規登録する')
-  }
-
-  /**
-   * 一日の収支リストを更新
-   */
-  @Action
-  updatePaymentDetailList(list: PaymentDetail[]) {
-    console.log(list + 'を更新する')
+  updatePaymentDetailList(_payload: any) {
+    const param: any = _payload
+    let error = false
+    axios
+      .post('api/payment', param)
+      .catch(() => {
+        error = true
+      })
+      .then(() => {
+        if (!error) {
+          // console.log(_payload[0].paymentDate)
+        }
+      })
   }
 
   /**

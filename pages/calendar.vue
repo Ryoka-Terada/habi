@@ -49,10 +49,6 @@ export default class Index extends Vue {
   /** 選択日 */
   selectDate!: string
 
-  get tmp() {
-    return this.$emit('ParentCategoryPayList')
-  }
-
   /** 関数用 */
   $refs: any
 
@@ -88,14 +84,14 @@ export default class Index extends Vue {
   /**
    * 選択された月の開始日と終了日をセット
    */
-  setBetweenDate(date: string): void {
+  async setBetweenDate(date: string): Promise<void> {
     const year = moment(date).year()
     const month = moment(date).month()
     const firstDate = new Date(year, month, 1).toLocaleDateString()
     const endDate = new Date(year, month + 1, 0).toLocaleDateString()
     this.searchParam.monthFirstDate = moment(firstDate).format('yyyy-MM-DD')
     this.searchParam.monthEndDate = moment(endDate).format('yyyy-MM-DD')
-    calendarStore.fetchMonthPaymentList(this.searchParam)
+    await calendarStore.fetchMonthPaymentList(this.searchParam)
   }
 
   /** 日付詳細画面に遷移 */
