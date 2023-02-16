@@ -58,10 +58,10 @@ export default class PaymentDetailModule extends VuexModule {
    * 一日の収支リストを登録
    */
   @Action
-  updatePaymentDetailList(_payload: any) {
+  async updatePaymentDetailList(_payload: any) {
     const param: any = _payload
     let error = false
-    axios
+    await axios
       .post('api/payment', param)
       .catch(() => {
         error = true

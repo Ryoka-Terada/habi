@@ -40,14 +40,10 @@
               <v-col cols="9" class="mx-3 pb-0">
                 <validation-provider
                   v-slot="{ errors }"
-                  rules="required|numeric"
+                  rules="required|min_value:1"
                   :name="$t('common.amount')"
                 >
-                  <v-text-field
-                    v-model="listItem.amount"
-                    type="Number"
-                    clearable
-                  />
+                  <v-text-field v-model="listItem.amount" clearable />
                   <p>{{ errors[0] }}</p>
                 </validation-provider>
               </v-col>
@@ -135,10 +131,10 @@ export default class paymentDetail extends Vue {
   /** 入力フォーム初期化 */
   initializeListItem(ispay: boolean) {
     return (this.listItem = {
-      paymentId: '',
+      paymentId: '0',
       parentId: '',
       childId: '',
-      paymentDate: '',
+      paymentDate: this.date,
       amount: 0,
       isPay: ispay,
     })
@@ -304,8 +300,12 @@ export default class paymentDetail extends Vue {
   }
 
   /** 登録・更新ボタンを押されたとき */
-  updateData() {
-    paymentDetailStore.updatePaymentDetailList(this.paymentDataList)
+  async updateData() {
+    // 収支リストが０の場合、初期化した値を送る
+    if (this.paymentDataList.length === 0) {
+      this.paymentDataList[0] = this.listItem
+    }
+    await paymentDetailStore.updatePaymentDetailList(this.paymentDataList)
     this.$router.push('/calendar')
   }
 
