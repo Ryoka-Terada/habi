@@ -37,7 +37,7 @@ export default class PaymentDetailModule extends VuexModule {
         dateTo: targetDate,
       },
     }
-    await axios.get('api/payment', param).then((value) => {
+    await axios.get('api/payments', param).then((value) => {
       const paymentDetailList = value.data.map(
         (paymentDetail: PaymentDetail) => {
           return {
@@ -62,7 +62,7 @@ export default class PaymentDetailModule extends VuexModule {
     const param: any = _payload
     let error = false
     await axios
-      .post('api/payment', param)
+      .post('api/payments', param)
       .catch(() => {
         error = true
       })

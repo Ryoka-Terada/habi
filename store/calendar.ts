@@ -59,7 +59,7 @@ export default class CalendarModule extends VuexModule {
         dateTo: _payload.monthEndDate,
       },
     }
-    axios.get('api/payment', param).then((value) => {
+    axios.get('api/payments', param).then((value) => {
       const payments = value.data.map((calendar: Calendar) => {
         return {
           paymentId: calendar.paymentId,

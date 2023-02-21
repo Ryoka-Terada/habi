@@ -38,12 +38,6 @@ export default class CategoryModule extends VuexModule {
   private childCategoryIncomeList: ChildCategory[] = []
 
   /**
-   * 子カテゴリ一覧(親カテゴリ指定)
-   * @type {ChildCategory[]}
-   */
-  // private selectChildCategoryList: ChildCategory[] = []
-
-  /**
    * 親カテゴリ一覧(支出)を返す
    * @return {ParentCategory[]}
    */
@@ -81,7 +75,7 @@ export default class CategoryModule extends VuexModule {
   @Action
   async fetchParentCategoryList(_payload?: any): Promise<void> {
     await axios
-      .get('api/paymentCategoryParent', _payload)
+      .get('api/paymentCategoryParents', _payload)
       .then((value: any) => {
         const payList: ParentCategory[] = value.data
           .filter((parentCategory: ParentCategory) => {
@@ -123,53 +117,43 @@ export default class CategoryModule extends VuexModule {
    */
   @Action
   async fetchChildCategoryList(_payload?: any): Promise<void> {
-    await axios.get('api/paymentCategoryChild', _payload).then((value: any) => {
-      const payList: ChildCategory[] = value.data
-        .filter((childCategory: ChildCategory) => {
-          return !!childCategory.isPay
-        })
-        .map((childCategory: ChildCategory) => {
-          return {
-            childId: childCategory.childId,
-            categoryName: childCategory.categoryName,
-            parentId: childCategory.parentId,
-            isDelete: childCategory.isDelete,
-            createdAt: childCategory.createdAt,
-            updatedAt: childCategory.updatedAt,
-            isPay: !!childCategory.isPay,
-          }
-        })
-      const incomeList: ChildCategory[] = value.data
-        .filter((childCategory: ChildCategory) => {
-          return !childCategory.isPay
-        })
-        .map((childCategory: ChildCategory) => {
-          return {
-            childId: childCategory.childId,
-            categoryName: childCategory.categoryName,
-            parentId: childCategory.parentId,
-            isDelete: childCategory.isDelete,
-            createdAt: childCategory.createdAt,
-            updatedAt: childCategory.updatedAt,
-            isPay: !!childCategory.isPay,
-          }
-        })
-      this.setChildCategoryPayList(payList)
-      this.setChildCategoryIncomeList(incomeList)
-    })
+    await axios
+      .get('api/paymentCategoryChildren', _payload)
+      .then((value: any) => {
+        const payList: ChildCategory[] = value.data
+          .filter((childCategory: ChildCategory) => {
+            return !!childCategory.isPay
+          })
+          .map((childCategory: ChildCategory) => {
+            return {
+              childId: childCategory.childId,
+              categoryName: childCategory.categoryName,
+              parentId: childCategory.parentId,
+              isDelete: childCategory.isDelete,
+              createdAt: childCategory.createdAt,
+              updatedAt: childCategory.updatedAt,
+              isPay: !!childCategory.isPay,
+            }
+          })
+        const incomeList: ChildCategory[] = value.data
+          .filter((childCategory: ChildCategory) => {
+            return !childCategory.isPay
+          })
+          .map((childCategory: ChildCategory) => {
+            return {
+              childId: childCategory.childId,
+              categoryName: childCategory.categoryName,
+              parentId: childCategory.parentId,
+              isDelete: childCategory.isDelete,
+              createdAt: childCategory.createdAt,
+              updatedAt: childCategory.updatedAt,
+              isPay: !!childCategory.isPay,
+            }
+          })
+        this.setChildCategoryPayList(payList)
+        this.setChildCategoryIncomeList(incomeList)
+      })
   }
-
-  /**
-   * 子カテゴリ一覧(親カテゴリ指定)を取得
-   * これはfetchじゃなくてgetterであるべき
-   */
-  // @Action
-  // fetchSelectChildCategoryList(parentId: string) {
-  //   const selectChildCategoryList = this.childCategoryList.filter((data) => {
-  //     return data.parentId === parentId
-  //   })
-  //   this.setSelectChildCategoryList(selectChildCategoryList)
-  // }
 
   /**
    * 親カテゴリ一覧(支出)をセット
@@ -202,12 +186,4 @@ export default class CategoryModule extends VuexModule {
   setChildCategoryIncomeList(list: ChildCategory[]) {
     this.childCategoryIncomeList = list
   }
-
-  // /**
-  //  * 子カテゴリ一覧(親カテゴリ指定)をセット
-  //  */
-  // @Mutation
-  // setSelectChildCategoryList(list: ChildCategory[]) {
-  //   this.selectChildCategoryList = list
-  // }
 }
