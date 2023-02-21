@@ -1,6 +1,16 @@
-# インスタント家計簿アプリのフロントエンドです
+# habi
 
-## 使用技術(フレームワークやプラグインなど)
+家計簿アプリのフロントエンドのリポジトリです。
+
+# プロジェクト概要
+
+### アプリ名：インスタント家計簿
+
+### 略称は"HABI"（Household Account Book Instant）
+
+写ルンです的な、廉価版家計簿アプリ
+
+# 言語とフレームワーク、ライブラリやプラグイン等
 
 - Nuxt.js
 - Typescript
@@ -10,9 +20,39 @@
 
 etc...
 
-# front
+# 開発対象機能の概要
 
-## Build Setup
+## 機能要件
+
+| 機能概要               | 説明                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| ログイン機能           | メールアドレスとパスワードでログインする。                                                                                     |
+| カレンダー（TOP 画面） | 月の合計収支が確認できること。                                                                                                 |
+|                        | 月のカテゴリごとの合計収支が確認できること。                                                                                   |
+|                        | 日の合計収支が確認できること。                                                                                                 |
+| 収支登録機能           | 日の収支が登録できること。<br />「収支フラグ、合計料金、親カテゴリ、子カテゴリ」を１単位として、複数の収支が登録できること。　 |
+|                        | 日のメモが登録できること。                                                                                                     |
+| カテゴリ管理機能       | 収支のカテゴリが複数登録できること。<br />親カテゴリに紐づく子カテゴリが複数登録できること。                                   |
+
+## 非機能要件
+
+| 機能概要         | 説明                                                           |
+| ---------------- | -------------------------------------------------------------- |
+| バックアップ機能 | バックアップ取得間隔：要検討<br />バックアップ保存期間：要検討 |
+| 高負荷時への対応 | ユーザは数人の予定なのでサーバーの台数増加などの対応なし。     |
+| データの保守性   | 収支データの保存期間は、アクティブユーザの場合は無制限とする。 |
+|                  | 退会したユーザのデータは一カ月保存した後、全て削除する。       |
+| セキュリティ     | 全てのユーザにはメールアドレスとパスワードでの認証を行う。     |
+
+# 画面レイアウト
+
+※設計時のもの。実際のものとは異なります。draw.io で作成。
+
+![UI](https://user-images.githubusercontent.com/77401198/220348417-8846c81b-bbdd-4508-a747-2da11a8ed12e.png)
+
+# セットアップ
+
+このリポジトリをローカルにダウンロード。以下コマンドで立ち上げる。
 
 ```bash
 # install dependencies
@@ -20,61 +60,6 @@ $ npm install
 
 # serve with hot reload at localhost:3000
 $ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
 ```
 
 For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
-
-## Special Directories
-
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
-
-### `assets`
-
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
-
-### `components`
-
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
-
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
